@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEMGROUPE — Compagnie des Experts Maritimes · Afrique de l'Ouest</title>
+<meta name="description" content="CEMGROUPE est le premier réseau d'experts maritimes indépendants d'Afrique de l'Ouest. Présent en Côte d'Ivoire, Bénin, Togo, Sénégal, Cameroun et Ghana.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   CEMGROUPE — SITE INTERNET v2.0
+   Design : Navy #0a1628 + Or #c9a227
+   ═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:  #060F1F;
+  --navy2: #0A1C38;
+  --navy3: #1E3A6E;
+  --gold:  #C9A227;
+  --gold2: #E8C55A;
+  --gold3: #F5E5AA;
+  --white: #F8F5EF;
+  --gray:  #8A9BB0;
+  --radius:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--navy)}
+::-webkit-scrollbar-thumb{background:rgba(201,162,39,.4);border-radius:2px}
+
+/* ══ REVEAL ══ */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:none}
+.reveal-l{opacity:0;transform:translateX(-28px);transition:opacity .8s ease,transform .8s ease}
+.reveal-l.visible{opacity:1;transform:none}
+.reveal-r{opacity:0;transform:translateX(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal-r.visible{opacity:1;transform:none}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;width:100%;z-index:1000;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.85rem 5%;
+  background:rgba(6,15,31,0.97);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(201,162,39,.18);
+  transition:padding .3s;
+}
+nav.scrolled{padding:.6rem 5%}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-icon{
+  width:38px;height:38px;
+  background:var(--gold);border-radius:6px;
+  display:grid;place-items:center;
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--navy);
+  flex-shrink:0;
+}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);letter-spacing:.5px}
+.logo-sub{font-size:.56rem;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;margin-top:1px}
+.nav-links{list-style:none;display:flex;gap:1.8rem;align-items:center}
+.nav-links a{text-decoration:none;color:var(--gray);font-size:.83rem;transition:color .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{
+  background:var(--gold)!important;color:var(--navy)!important;
+  font-weight:600!important;padding:.45rem 1.1rem;border-radius:4px;
+  font-size:.8rem!important;transition:background .2s!important;
+}
+.nav-cta:hover{background:var(--gold2)!important}
+.nav-login{
+  border:1px solid rgba(201,162,39,.5)!important;color:var(--gold)!important;
+  padding:.45rem 1rem;border-radius:4px;
+  font-size:.8rem!important;transition:all .2s!important;
+}
+.nav-login:hover{background:rgba(201,162,39,.08)!important;border-color:var(--gold)!important}
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.hamburger span{width:22px;height:2px;background:var(--white);border-radius:2px;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-menu{
+  display:none;position:fixed;top:64px;left:0;right:0;z-index:999;
+  background:rgba(6,15,31,.98);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(201,162,39,.15);
+  padding:1.5rem 5%;flex-direction:column;gap:.8rem;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:var(--gray);text-decoration:none;font-size:.9rem;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mobile-menu a:last-child{border-bottom:none;color:var(--gold);font-weight:600}
+
+/* ═══════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════ */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  padding:0 5%;overflow:hidden;padding-top:70px;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=85');
+  background-size:cover;background-position:center 40%;
+  animation:heroZoom 20s ease-in-out infinite alternate;
+}
+@keyframes heroZoom{from{transform:scale(1.02)}to{transform:scale(1.07)}}
+.hero-ov1{position:absolute;inset:0;background:linear-gradient(110deg,rgba(6,15,31,.93) 0%,rgba(6,15,31,.72) 50%,rgba(6,15,31,.35) 100%)}
+.hero-ov2{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,15,31,.95) 0%,transparent 50%)}
+.hero-content{position:relative;z-index:2;max-width:660px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  color:var(--gold);font-size:.72rem;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:1.5rem;font-weight:500;
+}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--gold)}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.6rem,5.5vw,4.2rem);
+  line-height:1.08;margin-bottom:1.4rem;
+}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero-desc{
+  font-size:1rem;line-height:1.85;
+  color:rgba(248,245,239,.78);
+  max-width:520px;margin-bottom:2.5rem;
+}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-gold{
+  background:var(--gold);color:var(--navy);font-weight:600;
+  padding:.9rem 2rem;border-radius:4px;text-decoration:none;
+  font-size:.86rem;transition:all .25s;white-space:nowrap;
+}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,162,39,.3)}
+.btn-outline{
+  border:1px solid rgba(201,162,39,.45);color:var(--gold);
+  padding:.9rem 2rem;border-radius:4px;text-decoration:none;
+  font-size:.86rem;transition:all .25s;white-space:nowrap;
+}
+.btn-outline:hover{background:rgba(201,162,39,.09);border-color:var(--gold)}
+.hero-stats{
+  position:absolute;right:5%;bottom:12%;z-index:2;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.stat-card{
+  background:rgba(6,15,31,.7);border:1px solid rgba(201,162,39,.28);
+  padding:1rem 1.4rem;border-radius:8px;text-align:right;
+  backdrop-filter:blur(12px);min-width:130px;
+  opacity:0;animation:statIn .9s ease forwards;
+}
+.stat-card:nth-child(1){animation-delay:.4s}
+.stat-card:nth-child(2){animation-delay:.6s}
+.stat-card:nth-child(3){animation-delay:.8s}
+@keyframes statIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.stat-val{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1}
+.stat-lbl{font-size:.64rem;color:var(--gray);letter-spacing:1px;margin-top:3px}
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  animation:bounce 2.4s ease-in-out infinite;
+}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.scroll-hint span{font-size:.6rem;color:rgba(201,162,39,.55);letter-spacing:2.5px;text-transform:uppercase}
+.scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,transparent,var(--gold))}
+
+/* ══ ACCRÉDITATIONS ══ */
+.accbar{
+  background:var(--gold);padding:.8rem 5%;
+  display:flex;gap:2rem;align-items:center;overflow:hidden;
+}
+.acc-label{font-size:.64rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--navy);font-weight:600;white-space:nowrap}
+.acc-track{display:flex;gap:2.5rem;animation:scrollx 26s linear infinite;white-space:nowrap}
+.acc-item{font-size:.75rem;color:var(--navy);font-weight:500}
+@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ═══════════════════════════════════════════
+   SHARED TYPOGRAPHY
+   ═══════════════════════════════════════════ */
+section{padding:5.5rem 5%}
+.section-tag{font-size:.66rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;font-weight:500}
+.section-tag::before{content:'— '}
+h2{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.7rem);line-height:1.15;color:var(--white);margin-bottom:1.1rem}
+h2 em{font-style:normal;color:var(--gold)}
+.section-lead{color:var(--gray);line-height:1.85;max-width:560px;font-size:.95rem}
+.divider{width:40px;height:2px;background:var(--gold);margin:1.2rem 0;opacity:.6}
+
+/* ═══════════════════════════════════════════
+   ABOUT
+   ═══════════════════════════════════════════ */
+.about{background:var(--navy2)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-media{position:relative;border-radius:10px;overflow:hidden}
+.about-media img{width:100%;height:420px;object-fit:cover;display:block;filter:brightness(.85)}
+.about-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,15,31,.5),transparent)}
+.about-badge{
+  position:absolute;bottom:1.5rem;left:1.5rem;
+  background:var(--gold);color:var(--navy);
+  padding:.6rem 1.2rem;border-radius:5px;
+  font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;
+}
+.about-text p{color:var(--gray);line-height:1.88;margin-bottom:1.2rem;font-size:.93rem}
+.about-facts{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem}
+.fact{border-left:2px solid var(--gold);padding-left:1.1rem}
+.fact-n{font-family:'Playfair Display',serif;font-size:1.75rem;color:var(--gold);line-height:1}
+.fact-l{font-size:.72rem;color:var(--gray);margin-top:3px;letter-spacing:.3px}
+
+/* ═══════════════════════════════════════════
+   FILIALES / RÉSEAU AGENCES
+   ═══════════════════════════════════════════ */
+.filiales{background:var(--navy);padding:5.5rem 5%}
+.filiales-hdr{text-align:center;margin-bottom:3.5rem}
+.filiales-hdr .section-lead{margin:0 auto}
+.filiales-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.fil-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(201,162,39,.14);
+  border-radius:10px;padding:1.6rem 1.5rem;
+  transition:all .3s;position:relative;overflow:hidden;
+  cursor:default;
+}
+.fil-card:hover{
+  background:rgba(201,162,39,.07);
+  border-color:rgba(201,162,39,.4);
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(0,0,0,.4);
+}
+.fil-card.siege-card{
+  border-color:rgba(201,162,39,.4);
+  background:rgba(201,162,39,.06);
+}
+.fil-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.fil-card:hover::before,.fil-card.siege-card::before{opacity:1}
+.fil-flag{font-size:2rem;margin-bottom:.9rem;display:block}
+.fil-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.fil-nom{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white);font-weight:600}
+.fil-siege-badge{
+  font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--gold);color:var(--navy);
+  padding:2px 7px;border-radius:10px;font-weight:600;
+}
+.fil-pays{font-size:.8rem;color:var(--gray);margin-bottom:.3rem}
+.fil-ville{font-size:.75rem;color:rgba(201,162,39,.7);display:flex;align-items:center;gap:4px}
+.fil-sep{width:100%;height:1px;background:rgba(201,162,39,.12);margin:1rem 0}
+.fil-status{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--gray)}
+.fil-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px rgba(201,162,39,.5)}
+
+/* ═══════════════════════════════════════════
+   SERVICES
+   ═══════════════════════════════════════════ */
+.services{background:var(--navy2)}
+.svc-intro{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3rem;gap:3rem;flex-wrap:wrap}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(201,162,39,.1)}
+.svc-card{
+  background:var(--navy2);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;transition:background .3s;
+}
+.svc-card:hover{background:rgba(30,58,110,.6)}
+.svc-img-wrap{overflow:hidden;flex-shrink:0}
+.svc-img{width:100%;height:190px;object-fit:cover;display:block;transition:transform .7s ease;filter:brightness(.82)}
+.svc-card:hover .svc-img{transform:scale(1.07)}
+.svc-body{padding:1.4rem 1.5rem;flex:1}
+.svc-icon-row{display:flex;align-items:center;gap:10px;margin-bottom:.7rem}
+.svc-icon{
+  width:32px;height:32px;border:1px solid rgba(201,162,39,.38);
+  border-radius:4px;display:grid;place-items:center;font-size:.82rem;flex-shrink:0;
+}
+.svc-card h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--white)}
+.svc-body p{color:var(--gray);font-size:.82rem;line-height:1.72;margin-top:.5rem}
+.svc-link{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--gold);font-size:.77rem;margin-top:.9rem;
+  text-decoration:none;transition:gap .2s;
+}
+.svc-link:hover{gap:9px}
+
+/* ═══════════════════════════════════════════
+   CHIFFRES CLÉS
+   ═══════════════════════════════════════════ */
+.numbers{
+  background:var(--navy);position:relative;overflow:hidden;padding:4.5rem 5%;
+}
+.numbers-bg{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1504855012456-2b72578b82c3?auto=format&fit=crop&w=1920&q=70');
+  background-size:cover;background-position:center;opacity:.08;
+}
+.numbers-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center}
+.num-val{font-family:'Playfair Display',serif;font-size:3rem;color:var(--gold);line-height:1}
+.num-sep{width:30px;height:1px;background:rgba(201,162,39,.4);margin:.55rem auto 0}
+.num-lbl{font-size:.78rem;color:var(--gray);margin-top:.55rem;letter-spacing:.3px;line-height:1.4}
+
+/* ═══════════════════════════════════════════
+   CARTE LEAFLET
+   ═══════════════════════════════════════════ */
+.mapsec{background:var(--navy2);padding:5.5rem 5%}
+.map-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;gap:2rem;flex-wrap:wrap}
+.map-layout{display:grid;grid-template-columns:1fr 320px;gap:2.5rem;align-items:start}
+.map-box{border-radius:10px;overflow:hidden;border:1px solid rgba(201,162,39,.2);position:relative}
+#cem-map{height:540px;width:100%;background:#0a1628}
+.leaflet-container{background:#0d1f38!important}
+.leaflet-tile{filter:brightness(.7) saturate(.65) hue-rotate(200deg)}
+.leaflet-control-zoom a{background:rgba(6,15,31,.9)!important;color:var(--gold)!important;border-color:rgba(201,162,39,.3)!important}
+.leaflet-control-zoom a:hover{background:rgba(30,58,95,.9)!important}
+.leaflet-control-attribution{background:rgba(6,15,31,.8)!important;color:rgba(138,155,176,.6)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:rgba(201,162,39,.5)!important}
+.cem-popup .leaflet-popup-content-wrapper{background:#060F1F;border:1px solid var(--gold);border-radius:8px;color:var(--white);padding:0;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.cem-popup .leaflet-popup-content{margin:0;padding:0}
+.cem-popup .leaflet-popup-tip{background:#060F1F}
+.cem-popup .leaflet-popup-close-button{color:var(--gold)!important;font-size:16px!important;top:8px!important;right:10px!important}
+.popup-inner{padding:1.1rem 1.3rem}
+.popup-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);margin-bottom:3px}
+.popup-country{font-size:.74rem;color:var(--gray);margin-bottom:.6rem}
+.popup-badge{display:inline-block;font-size:.68rem;padding:2px 8px;border-radius:10px;margin-bottom:.7rem}
+.popup-badge.actif{background:rgba(201,162,39,.15);color:var(--gold)}
+.popup-badge.siege{background:rgba(201,162,39,.25);color:var(--gold);font-weight:600}
+.popup-badge.correspondent{background:rgba(138,155,176,.12);color:var(--gray)}
+.popup-desc{font-size:.77rem;color:rgba(248,245,239,.75);line-height:1.55}
+.popup-dossiers{font-size:.74rem;color:var(--gold);margin-top:.5rem;font-weight:500}
+.plist{display:flex;flex-direction:column;gap:.6rem;max-height:540px;overflow-y:auto;padding-right:4px}
+.plist::-webkit-scrollbar{width:3px}
+.plist::-webkit-scrollbar-thumb{background:rgba(201,162,39,.3);border-radius:2px}
+.port-item{
+  background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.13);
+  border-radius:8px;padding:.85rem 1rem;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:10px;
+}
+.port-item:hover,.port-item.active{background:rgba(201,162,39,.1);border-color:var(--gold)}
+.port-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 7px rgba(201,162,39,.5)}
+.port-dot.inactive{background:var(--gray);box-shadow:none}
+.port-info{flex:1;min-width:0}
+.port-name{font-size:.84rem;font-weight:500;color:var(--white)}
+.port-sub{font-size:.68rem;color:var(--gray);margin-top:1px}
+.port-count{font-size:.7rem;color:var(--gold);white-space:nowrap;text-align:right}
+.map-legend{display:flex;gap:1.8rem;margin-top:1.2rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--gray)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ═══════════════════════════════════════════
+   DIRECTION
+   ═══════════════════════════════════════════ */
+.direction{background:var(--navy);padding:5.5rem 5%}
+.direction-hdr{text-align:center;margin-bottom:3.5rem}
+.direction-hdr .section-lead{margin:0 auto}
+.direction-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;max-width:800px;margin:0 auto}
+.dir-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.16);
+  border-radius:12px;padding:2rem;transition:all .3s;
+  display:flex;gap:1.5rem;align-items:flex-start;
+}
+.dir-card:hover{background:rgba(201,162,39,.06);border-color:rgba(201,162,39,.35);transform:translateY(-3px)}
+.dir-avatar{
+  width:56px;height:56px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(201,162,39,.2),rgba(201,162,39,.05));
+  border:1px solid rgba(201,162,39,.35);
+  display:grid;place-items:center;
+  font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);
+  flex-shrink:0;
+}
+.dir-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--white);margin-bottom:.2rem}
+.dir-titre{font-size:.76rem;color:var(--gold);font-weight:500;margin-bottom:.6rem;letter-spacing:.2px}
+.dir-desc{font-size:.79rem;color:var(--gray);line-height:1.65}
+.dir-filiale{font-size:.68rem;color:rgba(201,162,39,.6);margin-top:.5rem;display:flex;align-items:center;gap:4px}
+
+/* ═══════════════════════════════════════════
+   PLATEFORME CEMPROG
+   ═══════════════════════════════════════════ */
+.platform{background:var(--navy2);padding:5.5rem 5%}
+.platform-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.platform-visual{position:relative;border-radius:10px;overflow:hidden}
+.platform-visual img{width:100%;display:block;filter:brightness(.85);border-radius:10px}
+.platform-badge{
+  position:absolute;top:1.2rem;left:1.2rem;
+  background:rgba(6,15,31,.88);border:1px solid rgba(201,162,39,.4);
+  border-radius:5px;padding:.45rem .9rem;
+  font-size:.7rem;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;
+  backdrop-filter:blur(6px);
+}
+.platform-screen{
+  position:absolute;bottom:-1.5rem;right:-1.5rem;width:55%;
+  border-radius:8px;overflow:hidden;border:1px solid rgba(201,162,39,.25);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+.platform-screen img{width:100%;display:block;filter:brightness(.9)}
+.module-item{
+  display:flex;gap:12px;
+  padding:.9rem 1.1rem;
+  background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.12);
+  border-radius:7px;margin-bottom:.7rem;cursor:default;
+  transition:all .25s;
+}
+.module-item:hover{background:rgba(201,162,39,.08);border-color:rgba(201,162,39,.3)}
+.module-num{
+  font-family:'Playfair Display',serif;font-size:1.3rem;
+  color:rgba(201,162,39,.28);line-height:1;flex-shrink:0;width:22px;
+}
+.module-title{font-size:.87rem;font-weight:500;color:var(--white);margin-bottom:2px}
+.module-desc{font-size:.75rem;color:var(--gray);line-height:1.5}
+.platform-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:1.8rem;
+  background:transparent;border:1px solid rgba(201,162,39,.45);
+  color:var(--gold);padding:.8rem 1.6rem;border-radius:5px;
+  text-decoration:none;font-size:.83rem;font-weight:500;
+  transition:all .25s;
+}
+.platform-cta:hover{background:rgba(201,162,39,.1);border-color:var(--gold)}
+.platform-cta-arrow{transition:transform .2s}
+.platform-cta:hover .platform-cta-arrow{transform:translateX(4px)}
+
+/* ═══════════════════════════════════════════
+   INTERVENTIONS / STORY
+   ═══════════════════════════════════════════ */
+.story{background:var(--navy);padding:5.5rem 5%}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(201,162,39,.09);border-radius:10px;overflow:hidden;margin-top:2.5rem}
+.story-card{position:relative;overflow:hidden;min-height:340px}
+.story-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .7s ease}
+.story-card:hover .story-img{transform:scale(1.06)}
+.story-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,15,31,.95) 0%,rgba(6,15,31,.5) 50%,rgba(6,15,31,.18) 100%)}
+.story-body{position:relative;z-index:2;padding:2rem;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.story-tag-lbl{font-size:.64rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;font-weight:500}
+.story-body h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);line-height:1.25;margin-bottom:.5rem}
+.story-body p{font-size:.82rem;color:rgba(248,245,239,.72);line-height:1.72}
+
+/* ═══════════════════════════════════════════
+   TÉMOIGNAGES
+   ═══════════════════════════════════════════ */
+.testimonials{background:var(--navy2);position:relative;overflow:hidden;padding:5.5rem 5%}
+.test-bg-img{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=70');background-size:cover;background-position:center;opacity:.06}
+.testimonials-hdr{text-align:center;margin-bottom:3rem;position:relative}
+.testimonials-hdr .section-lead{margin:0 auto}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;position:relative}
+.test-card{
+  background:rgba(6,15,31,.85);border:1px solid rgba(201,162,39,.16);
+  border-radius:10px;padding:1.7rem;backdrop-filter:blur(8px);
+  transition:all .3s;
+}
+.test-card:hover{border-color:rgba(201,162,39,.35);transform:translateY(-3px)}
+.test-quote{font-size:2.2rem;color:var(--gold);line-height:1;margin-bottom:.8rem;font-family:'Playfair Display',serif;opacity:.45}
+.test-text{font-size:.85rem;color:rgba(248,245,239,.8);line-height:1.8;font-style:italic;margin-bottom:1.3rem}
+.test-author{display:flex;align-items:center;gap:10px}
+.test-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(201,162,39,.16);border:1px solid rgba(201,162,39,.3);
+  display:grid;place-items:center;font-size:.76rem;font-weight:600;color:var(--gold);flex-shrink:0;
+}
+.test-name{font-size:.82rem;font-weight:500;color:var(--white)}
+.test-company{font-size:.7rem;color:var(--gray);margin-top:1px}
+
+/* ═══════════════════════════════════════════
+   CONTACT
+   ═══════════════════════════════════════════ */
+.contact{background:var(--navy);padding:5.5rem 5%}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.contact-media{border-radius:10px;overflow:hidden;margin-bottom:2rem;position:relative}
+.contact-media img{width:100%;height:260px;object-fit:cover;display:block;filter:brightness(.75)}
+.contact-media-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,15,31,.75),transparent)}
+.contact-media-tag{position:absolute;bottom:1.2rem;left:1.2rem;background:var(--gold);color:var(--navy);font-size:.72rem;font-weight:600;padding:.35rem .8rem;border-radius:4px}
+.contact-info p{color:var(--gray);line-height:1.85;margin-bottom:1.8rem;font-size:.93rem}
+.contact-detail{display:flex;gap:12px;margin-bottom:1.1rem;align-items:flex-start}
+.contact-detail-icon{
+  width:34px;height:34px;border:1px solid rgba(201,162,39,.3);
+  border-radius:5px;display:grid;place-items:center;flex-shrink:0;font-size:.84rem;
+}
+.contact-detail small{color:var(--gray);font-size:.64rem;letter-spacing:1.5px;text-transform:uppercase;display:block}
+.contact-detail p{color:var(--white);font-size:.85rem;margin-top:3px}
+/* Formulaire */
+.form-title{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--white);margin-bottom:1.6rem}
+form{display:flex;flex-direction:column;gap:1.1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+label{font-size:.65rem;color:var(--gray);letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+input,select,textarea{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  color:var(--white);padding:.72rem 1rem;border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;
+  transition:border-color .2s;outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);background:rgba(201,162,39,.04)}
+textarea{resize:vertical;min-height:100px}
+select option{background:var(--navy2)}
+.form-submit{
+  background:var(--gold);color:var(--navy);font-weight:600;
+  padding:.88rem 2rem;border:none;border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:.86rem;cursor:pointer;
+  align-self:flex-start;transition:background .2s;
+}
+.form-submit:hover{background:var(--gold2)}
+.form-success{
+  display:none;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);
+  border-radius:8px;padding:1.2rem 1.5rem;color:var(--gold);font-size:.88rem;text-align:center;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+footer{background:#03080F;padding:4rem 5% 2rem;border-top:1px solid rgba(201,162,39,.1)}
+.footer-grid{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand p{color:var(--gray);font-size:.8rem;line-height:1.75;margin-top:.8rem;max-width:240px}
+.footer-filiales-mini{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
+.fil-mini{font-size:.66rem;color:rgba(201,162,39,.7);background:rgba(201,162,39,.08);padding:2px 7px;border-radius:10px}
+.footer-col h4{font-size:.66rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;font-weight:600}
+.footer-col a{display:block;color:var(--gray);font-size:.8rem;text-decoration:none;margin-bottom:.5rem;transition:color .2s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.06);padding-top:1.8rem;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;
+}
+.footer-bottom p{font-size:.72rem;color:var(--gray)}
+.footer-cities{color:rgba(201,162,39,.7)!important;font-size:.7rem!important}
+
+/* ═══════════════════════════════════════════
+   BACK TO TOP
+   ═══════════════════════════════════════════ */
+.back-top{
+  position:fixed;bottom:2rem;right:2rem;z-index:500;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--gold);color:var(--navy);border:none;cursor:pointer;
+  display:grid;place-items:center;font-size:1rem;
+  opacity:0;transform:translateY(10px);transition:all .3s;
+  box-shadow:0 4px 16px rgba(201,162,39,.35);
+}
+.back-top.visible{opacity:1;transform:none}
+.back-top:hover{background:var(--gold2);transform:translateY(-3px)!important}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media(max-width:1024px){
+  .filiales-grid{grid-template-columns:repeat(2,1fr)}
+  .numbers-grid{grid-template-columns:repeat(2,1fr);gap:2.5rem}
+  .map-layout{grid-template-columns:1fr}
+  .plist{max-height:260px}
+  .platform-grid{grid-template-columns:1fr}
+  .direction-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .hero-stats{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .filiales-grid{grid-template-columns:1fr 1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .story-grid{grid-template-columns:1fr}
+  .test-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .filiales-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ NAV ══════════════════════════ -->
+<nav id="mainNav">
+  <a href="#" class="logo">
+    <div class="logo-icon">⚓</div>
+    <div class="logo-text">
+      <span class="logo-name">CEMGROUPE</span>
+      <span class="logo-sub">Compagnie des Experts Maritimes</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">À propos</a></li>
+    <li><a href="#services">Expertises</a></li>
+    <li><a href="#filiales">Filiales</a></li>
+    <li><a href="#reseau">Réseau</a></li>
+    <li><a href="#plateforme">Plateforme</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="http://localhost:5173" target="_blank" class="nav-login">Espace client</a></li>
+    <li><a href="#contact" class="nav-cta">Demande d'intervention</a></li>
+  </ul>
+  <button class="hamburger" id="menuBtn" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMenu()">À propos</a>
+  <a href="#services" onclick="toggleMenu()">Expertises</a>
+  <a href="#filiales" onclick="toggleMenu()">Filiales</a>
+  <a href="#reseau" onclick="toggleMenu()">Réseau portuaire</a>
+  <a href="#plateforme" onclick="toggleMenu()">Plateforme</a>
+  <a href="#contact" onclick="toggleMenu()">Contact</a>
+  <a href="http://localhost:5173" target="_blank">→ Connexion CEMPROG</a>
+</div>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-ov1"></div>
+  <div class="hero-ov2"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Expertise Maritime · Afrique de l'Ouest · Depuis 1990</div>
+    <h1>
+      L'expertise maritime<br>
+      <em>au service</em><br>
+      de vos certitudes
+    </h1>
+    <p class="hero-desc">
+      Présent dans 6 pays d'Afrique de l'Ouest, CEMGROUPE accompagne assureurs,
+      armateurs et commissionnaires avec rigueur et expertise reconnue depuis plus de 30 ans.
+      Siège à Abidjan — CEM-CI.
+    </p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-gold">Soumettre une intervention</a>
+      <a href="#filiales" class="btn-outline">Nos 6 filiales</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card"><div class="stat-val">6</div><div class="stat-lbl">Pays couverts</div></div>
+    <div class="stat-card"><div class="stat-val">30+</div><div class="stat-lbl">Années d'expérience</div></div>
+    <div class="stat-card"><div class="stat-val">13 841</div><div class="stat-lbl">Dossiers traités</div></div>
+  </div>
+  <div class="scroll-hint">
+    <span>Découvrir</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Barre accréditations -->
+<div class="accbar">
+  <div class="acc-label">Accréditations</div>
+  <div class="acc-track">
+    <span class="acc-item">CESAM Paris &nbsp;·&nbsp;</span>
+    <span class="acc-item">VHT Allemagne &nbsp;·&nbsp;</span>
+    <span class="acc-item">Lloyd's Agency &nbsp;·&nbsp;</span>
+    <span class="acc-item">IAIS Côte d'Ivoire &nbsp;·&nbsp;</span>
+    <span class="acc-item">Chambre des Experts Maritimes &nbsp;·&nbsp;</span>
+    <span class="acc-item">ISO 9001 Certifié &nbsp;·&nbsp;</span>
+    <span class="acc-item">CESAM Paris &nbsp;·&nbsp;</span>
+    <span class="acc-item">VHT Allemagne &nbsp;·&nbsp;</span>
+    <span class="acc-item">Lloyd's Agency &nbsp;·&nbsp;</span>
+    <span class="acc-item">IAIS Côte d'Ivoire &nbsp;·&nbsp;</span>
+    <span class="acc-item">Chambre des Experts Maritimes &nbsp;·&nbsp;</span>
+    <span class="acc-item">ISO 9001 Certifié &nbsp;·&nbsp;</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ABOUT ══════════════════════════ -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="reveal-l">
+      <div class="about-media">
+        <img src="https://images.unsplash.com/photo-1521722169645-ef8db2ea32b0?auto=format&fit=crop&w=900&q=85" alt="Expert maritime CEMGROUPE" loading="lazy">
+        <div class="about-overlay"></div>
+        <div class="about-badge">Depuis 1990 · Abidjan ★</div>
+      </div>
+    </div>
+    <div class="about-text reveal-r">
+      <div class="section-tag">Qui sommes-nous</div>
+      <h2>Premier réseau d'experts<br>maritimes indépendants<br><em>d'Afrique de l'Ouest</em></h2>
+      <div class="divider"></div>
+      <p>
+        CEMGROUPE — Compagnie des Experts Maritimes du Groupe — est née à Abidjan, Côte d'Ivoire.
+        Fondée en 1990, elle est aujourd'hui le réseau de référence pour toutes les missions d'expertise
+        maritime sur la côte atlantique africaine, avec son siège établi au Port d'Abidjan (CEM-CI).
+      </p>
+      <p>
+        Nos experts qualifiés, accrédités CESAM Paris et VHT Allemagne, interviennent sur les plus grands
+        ports d'Afrique de l'Ouest pour le compte des plus grandes compagnies d'assurance, armateurs et
+        institutions financières mondiales.
+      </p>
+      <div class="about-facts">
+        <div class="fact"><div class="fact-n">6</div><div class="fact-l">Filiales actives</div></div>
+        <div class="fact"><div class="fact-n">30+</div><div class="fact-l">Années d'expertise</div></div>
+        <div class="fact"><div class="fact-n">12</div><div class="fact-l">Experts certifiés</div></div>
+        <div class="fact"><div class="fact-n">5</div><div class="fact-l">Domaines d'expertise</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FILIALES ══════════════════════════ -->
+<section class="filiales" id="filiales">
+  <div class="filiales-hdr reveal">
+    <div class="section-tag">Notre présence</div>
+    <h2>6 filiales actives à travers<br><em>l'Afrique de l'Ouest</em></h2>
+    <p class="section-lead" style="margin-top:.8rem">
+      Du siège d'Abidjan à Accra, chaque filiale CEMGROUPE dispose d'experts certifiés
+      et d'une plateforme numérique intégrée pour le suivi des dossiers.
+    </p>
+  </div>
+  <div class="filiales-grid reveal">
+
+    <!-- CEM-CI — Siège -->
+    <div class="fil-card siege-card">
+      <span class="fil-flag">🇨🇮</span>
+      <div class="fil-head">
+        <div class="fil-nom">CEM-CI</div>
+        <span class="fil-siege-badge">★ Siège</span>
+      </div>
+      <div class="fil-pays">Côte d'Ivoire</div>
+      <div class="fil-ville">📍 Abidjan — Zone Portuaire</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status">
+        <div class="fil-dot"></div>
+        <span>Bureau principal · Actif</span>
+      </div>
+    </div>
+
+    <!-- CEM-Bénin -->
+    <div class="fil-card">
+      <span class="fil-flag">🇧🇯</span>
+      <div class="fil-head"><div class="fil-nom">CEM-Bénin</div></div>
+      <div class="fil-pays">Bénin</div>
+      <div class="fil-ville">📍 Cotonou</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status"><div class="fil-dot"></div><span>Bureau actif</span></div>
+    </div>
+
+    <!-- CEM-Togo -->
+    <div class="fil-card">
+      <span class="fil-flag">🇹🇬</span>
+      <div class="fil-head"><div class="fil-nom">CEM-Togo</div></div>
+      <div class="fil-pays">Togo</div>
+      <div class="fil-ville">📍 Lomé</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status"><div class="fil-dot"></div><span>Bureau actif</span></div>
+    </div>
+
+    <!-- CEM-Sénégal -->
+    <div class="fil-card">
+      <span class="fil-flag">🇸🇳</span>
+      <div class="fil-head"><div class="fil-nom">CEM-Sénégal</div></div>
+      <div class="fil-pays">Sénégal</div>
+      <div class="fil-ville">📍 Dakar</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status"><div class="fil-dot"></div><span>Bureau actif</span></div>
+    </div>
+
+    <!-- CEM-Cameroun -->
+    <div class="fil-card">
+      <span class="fil-flag">🇨🇲</span>
+      <div class="fil-head"><div class="fil-nom">CEM-Cameroun</div></div>
+      <div class="fil-pays">Cameroun</div>
+      <div class="fil-ville">📍 Douala</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status"><div class="fil-dot"></div><span>Bureau actif</span></div>
+    </div>
+
+    <!-- CEM-Ghana -->
+    <div class="fil-card">
+      <span class="fil-flag">🇬🇭</span>
+      <div class="fil-head"><div class="fil-nom">CEM-Ghana</div></div>
+      <div class="fil-pays">Ghana</div>
+      <div class="fil-ville">📍 Accra</div>
+      <div class="fil-sep"></div>
+      <div class="fil-status"><div class="fil-dot"></div><span>Bureau actif</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ SERVICES ══════════════════════════ -->
+<section class="services" id="services">
+  <div class="svc-intro reveal">
+    <div>
+      <div class="section-tag">Nos Expertises</div>
+      <h2>Domaines d'intervention<br><em>reconnus & certifiés</em></h2>
+    </div>
+    <p class="section-lead">
+      CESAM Paris · VHT Allemagne · 5 domaines couverts sur tous les ports du réseau CEMGROUPE.
+    </p>
+  </div>
+  <div class="svc-grid reveal">
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=800&q=80" alt="Corps" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">⚓</div><h3>Expertise Corps</h3></div>
+        <p>Inspection de navires, évaluation des dommages structurels, estimation des coûts de réparation pour armateurs et assureurs.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1531519381503-2ee90a0c2a67?auto=format&fit=crop&w=800&q=80" alt="Facultés" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">📦</div><h3>Expertise Facultés</h3></div>
+        <p>Contrôle et suivi des marchandises, certification de dépotage, surveillance des opérations de chargement / déchargement.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="Aéronautique" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">✈️</div><h3>Expertise Aéronautique</h3></div>
+        <p>Évaluation des dommages sur fret aérien, inspection des cargaisons et coordination avec les assureurs aviation.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=800&q=80" alt="Industrielle" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">🏭</div><h3>Expertise Industrielle</h3></div>
+        <p>Analyse de sinistres industriels, évaluation de pertes d'exploitation, expertise technique multidisciplinaire.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80" alt="Judiciaire" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">⚖️</div><h3>Expertise Judiciaire</h3></div>
+        <p>Missions judiciaires confiées par les tribunaux, arbitrages maritimes, rédaction de rapports à valeur légale.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-img-wrap">
+        <img class="svc-img" src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" alt="Contrôle" loading="lazy">
+      </div>
+      <div class="svc-body">
+        <div class="svc-icon-row"><div class="svc-icon">🔍</div><h3>Contrôle & Surveillance</h3></div>
+        <p>Suivi de stocks, surveillance d'opérations portuaires, attestations de conformité pour banques et institutions.</p>
+        <a href="#contact" class="svc-link">Soumettre une mission →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CHIFFRES ══════════════════════════ -->
+<section class="numbers">
+  <div class="numbers-bg"></div>
+  <div class="numbers-grid reveal">
+    <div>
+      <div class="num-val" data-target="13841">0</div>
+      <div class="num-sep"></div>
+      <div class="num-lbl">Dossiers traités</div>
+    </div>
+    <div>
+      <div class="num-val">6</div>
+      <div class="num-sep"></div>
+      <div class="num-lbl">Filiales actives<br>en Afrique de l'Ouest</div>
+    </div>
+    <div>
+      <div class="num-val">617</div>
+      <div class="num-sep"></div>
+      <div class="num-lbl">Factures / trimestre</div>
+    </div>
+    <div>
+      <div class="num-val">30+</div>
+      <div class="num-sep"></div>
+      <div class="num-lbl">Années d'expérience</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CARTE ══════════════════════════ -->
+<section class="mapsec" id="reseau">
+  <div class="map-hdr reveal">
+    <div>
+      <div class="section-tag">Réseau Portuaire</div>
+      <h2>Présents dans <em>6 pays</em><br>et ports d'Afrique de l'Ouest</h2>
+    </div>
+    <p class="section-lead">
+      Cliquez sur un marqueur ou un port dans la liste pour afficher les détails.
+      Les coordonnées GPS réelles de chaque port sont utilisées.
+    </p>
+  </div>
+  <div class="map-layout reveal">
+    <div class="map-box">
+      <div id="cem-map"></div>
+    </div>
+    <div class="plist" id="portList"></div>
+  </div>
+  <div class="map-legend reveal">
+    <div class="legend-item"><div class="legend-dot" style="background:#c9a227;box-shadow:0 0 6px rgba(201,162,39,.5)"></div>Siège — Abidjan (CEM-CI)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c9a227"></div>Bureau CEM actif</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8a9bb0"></div>Correspondant / En développement</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ DIRECTION ══════════════════════════ -->
+<section class="direction" id="direction">
+  <div class="direction-hdr reveal">
+    <div class="section-tag">Direction du Groupe</div>
+    <h2>La <em>direction générale</em><br>de CEMGROUPE</h2>
+    <p class="section-lead" style="margin:.8rem auto 0">
+      Une direction expérimentée qui pilote le développement du groupe à l'échelle de l'Afrique de l'Ouest
+      depuis le siège d'Abidjan.
+    </p>
+  </div>
+  <div class="direction-grid reveal">
+    <div class="dir-card">
+      <div class="dir-avatar">RB</div>
+      <div>
+        <div class="dir-name">Mme Raymonde BOURAIMA</div>
+        <div class="dir-titre">Directrice Générale — CEMGROUPE</div>
+        <p class="dir-desc">
+          À la tête de CEMGROUPE, Mme Bouraima pilote la stratégie du groupe, le développement
+          des filiales et les relations avec les grands partenaires institutionnels à l'échelle régionale.
+        </p>
+        <div class="dir-filiale">🇨🇮 Siège Abidjan — CEM-CI</div>
+      </div>
+    </div>
+    <div class="dir-card">
+      <div class="dir-avatar">CF</div>
+      <div>
+        <div class="dir-name">M. Christian FASSINOU</div>
+        <div class="dir-titre">Directeur Général Adjoint — CEMGROUPE</div>
+        <p class="dir-desc">
+          M. Fassinou assure la coordination opérationnelle des filiales du groupe, supervise la qualité
+          des expertises et accompagne le déploiement de la plateforme CEMPROG.
+        </p>
+        <div class="dir-filiale">🇨🇮 Siège Abidjan — CEM-CI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PLATEFORME ══════════════════════════ -->
+<section class="platform" id="plateforme">
+  <div class="platform-grid">
+    <div class="platform-visual reveal-l">
+      <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=82" alt="Plateforme CEMPROG" loading="lazy">
+      <div class="platform-badge">CEMPROG · Plateforme 2025</div>
+    </div>
+    <div class="reveal-r">
+      <div class="section-tag">Notre Système d'Information</div>
+      <h2>CEMPROG — La plateforme<br>de gestion<br><em>multi-filiales</em></h2>
+      <p class="section-lead" style="margin-bottom:1.8rem">
+        Centralisation des dossiers, experts, facturation et suivi en temps réel depuis n'importe
+        quelle filiale du réseau CEMGROUPE.
+      </p>
+      <div class="module-item">
+        <div class="module-num">01</div>
+        <div>
+          <div class="module-title">Gestion des dossiers & interventions</div>
+          <div class="module-desc">Demandes · Attribution · Suivi étapes · Historique complet</div>
+        </div>
+      </div>
+      <div class="module-item">
+        <div class="module-num">02</div>
+        <div>
+          <div class="module-title">Rapports & dactylographie</div>
+          <div class="module-desc">Dépôt numérique · Workflow signature · PDF sécurisés</div>
+        </div>
+      </div>
+      <div class="module-item">
+        <div class="module-num">03</div>
+        <div>
+          <div class="module-title">Facturation & provisions</div>
+          <div class="module-desc">Notes honoraires · TVA 18% · Règlements · Balance clients</div>
+        </div>
+      </div>
+      <div class="module-item">
+        <div class="module-num">04</div>
+        <div>
+          <div class="module-title">Tableau de bord Vue Groupe</div>
+          <div class="module-desc">KPIs consolidés · Comparaison filiales · Export & rapports</div>
+        </div>
+      </div>
+      <div class="module-item">
+        <div class="module-num">05</div>
+        <div>
+          <div class="module-title">Sécurité & traçabilité</div>
+          <div class="module-desc">Filigrane anti-fraude · Journal exports · Contrôle d'accès par rôle</div>
+        </div>
+      </div>
+      <a href="http://localhost:5173" target="_blank" class="platform-cta">
+        Accéder à CEMPROG <span class="platform-cta-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ STORY ══════════════════════════ -->
+<section class="story">
+  <div class="reveal">
+    <div class="section-tag">Nos interventions</div>
+    <h2>Au cœur des <em>opérations portuaires</em></h2>
+  </div>
+  <div class="story-grid">
+    <div class="story-card">
+      <img class="story-img" src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=900&q=82" alt="Conteneurs" loading="lazy">
+      <div class="story-ov"></div>
+      <div class="story-body">
+        <div class="story-tag-lbl">Dépotage & Contrôle</div>
+        <h3>Certification des conteneurs dans les grands ports</h3>
+        <p>Nos experts certifient quotidiennement des milliers de tonnes de marchandises à Abidjan, Lomé, Dakar, Cotonou et Douala.</p>
+      </div>
+    </div>
+    <div class="story-card">
+      <img class="story-img" src="https://images.unsplash.com/photo-1591792111137-5b8219d5fad6?auto=format&fit=crop&w=900&q=82" alt="Navire expertise" loading="lazy">
+      <div class="story-ov"></div>
+      <div class="story-body">
+        <div class="story-tag-lbl">Expertise Corps</div>
+        <h3>Inspection & évaluation des dommages navire</h3>
+        <p>Du draft survey à l'expertise de coque complète, nos experts certifiés CESAM interviennent sur les plus grands navires.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ TÉMOIGNAGES ══════════════════════════ -->
+<section class="testimonials">
+  <div class="test-bg-img"></div>
+  <div class="testimonials-hdr reveal">
+    <div class="section-tag">Témoignages</div>
+    <h2>La confiance de nos <em>partenaires</em></h2>
+    <p class="section-lead" style="margin:.8rem auto 0">Assureurs, armateurs et commissionnaires nous font confiance depuis des décennies.</p>
+  </div>
+  <div class="test-grid reveal">
+    <div class="test-card">
+      <div class="test-quote">"</div>
+      <p class="test-text">CEM Groupe est notre partenaire d'expertise de référence en Afrique de l'Ouest. Leurs rapports sont d'une précision et d'une fiabilité remarquables pour nos règlements de sinistres.</p>
+      <div class="test-author">
+        <div class="test-avatar">AL</div>
+        <div><div class="test-name">Direction Sinistres</div><div class="test-company">Allianz Côte d'Ivoire</div></div>
+      </div>
+    </div>
+    <div class="test-card">
+      <div class="test-quote">"</div>
+      <p class="test-text">En plus de 10 ans de collaboration, les experts CEMGROUPE ont toujours su intervenir avec célérité sur nos navires en escale. Un partenaire indispensable sur le réseau ouest-africain.</p>
+      <div class="test-author">
+        <div class="test-avatar">MC</div>
+        <div><div class="test-name">Port Operations Manager</div><div class="test-company">MAERSK Côte d'Ivoire</div></div>
+      </div>
+    </div>
+    <div class="test-card">
+      <div class="test-quote">"</div>
+      <p class="test-text">La couverture de CEMGROUPE sur 6 pays nous permet de gérer nos sinistres régionaux depuis un seul interlocuteur. Qualité constante et professionnalisme à chaque intervention.</p>
+      <div class="test-author">
+        <div class="test-avatar">SD</div>
+        <div><div class="test-name">Responsable Logistique</div><div class="test-company">SODIREP</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CONTACT ══════════════════════════ -->
+<section class="contact" id="contact">
+  <div class="contact-grid">
+    <div class="reveal-l">
+      <div class="contact-media">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=82" alt="Bureau CEMGROUPE" loading="lazy">
+        <div class="contact-media-ov"></div>
+        <div class="contact-media-tag">Siège Social · Abidjan, Côte d'Ivoire ★</div>
+      </div>
+      <div class="section-tag">Nous contacter</div>
+      <h2>Soumettre une <em>demande<br>d'intervention</em></h2>
+      <p>Notre équipe traite chaque demande avec diligence. Un expert qualifié vous est désigné dans les meilleurs délais depuis la filiale la plus proche.</p>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📍</div>
+        <div><small>Siège social</small><p>Abidjan, Côte d'Ivoire — Zone Portuaire</p></div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">🌍</div>
+        <div><small>Filiales</small><p>Cotonou · Lomé · Dakar · Douala · Accra</p></div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📞</div>
+        <div><small>Téléphone</small><p>+225 27 XX XX XX XX</p></div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">✉️</div>
+        <div><small>Email</small><p>contact@cemgroupe.com</p></div>
+      </div>
+    </div>
+    <div class="reveal-r">
+      <div class="form-title">Formulaire de demande</div>
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="field">
+            <label>Société / Organisme</label>
+            <input type="text" placeholder="Ex : MAERSK, Allianz CI…" required>
+          </div>
+          <div class="field">
+            <label>Votre référence</label>
+            <input type="text" placeholder="N° Police / Connaissement">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Nom & Prénom</label>
+            <input type="text" placeholder="Contact demandeur" required>
+          </div>
+          <div class="field">
+            <label>Email professionnel</label>
+            <input type="email" placeholder="vous@societe.com" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Filiale / Port d'intervention</label>
+          <select required>
+            <option value="">— Sélectionner la filiale —</option>
+            <option>🇨🇮 Abidjan (Côte d'Ivoire) — CEM-CI · Siège</option>
+            <option>🇨🇮 San Pedro (Côte d'Ivoire) — CEM-CI</option>
+            <option>🇸🇳 Dakar (Sénégal) — CEM-Sénégal</option>
+            <option>🇧🇯 Cotonou (Bénin) — CEM-Bénin</option>
+            <option>🇹🇬 Lomé (Togo) — CEM-Togo</option>
+            <option>🇨🇲 Douala (Cameroun) — CEM-Cameroun</option>
+            <option>🇬🇭 Accra / Tema (Ghana) — CEM-Ghana</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type d'expertise</label>
+          <select required>
+            <option value="">— Type d'intervention —</option>
+            <option>Expertise Corps (navire)</option>
+            <option>Expertise Facultés (marchandises)</option>
+            <option>Contrôle & Surveillance</option>
+            <option>Dépotage / Empotage</option>
+            <option>Expertise Judiciaire</option>
+            <option>Expertise Aéronautique</option>
+            <option>Expertise Industrielle</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Description de la mission</label>
+          <textarea placeholder="Navire, marchandise, objet de l'expertise, date souhaitée d'intervention…" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Envoyer la demande d'intervention →</button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        ✅ Votre demande a bien été envoyée. Un expert CEMGROUPE vous contactera dans les 24h.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-icon" style="width:34px;height:34px;font-size:.85rem">⚓</div>
+        <div class="logo-text">
+          <span class="logo-name" style="font-size:.95rem">CEMGROUPE</span>
+          <span class="logo-sub">Compagnie des Experts Maritimes</span>
+        </div>
+      </div>
+      <p>Premier réseau d'experts maritimes indépendants en Afrique de l'Ouest, accrédités CESAM et VHT depuis plus de 30 ans. Siège à Abidjan.</p>
+      <div class="footer-filiales-mini">
+        <span class="fil-mini">🇨🇮 CEM-CI</span>
+        <span class="fil-mini">🇧🇯 CEM-Bénin</span>
+        <span class="fil-mini">🇹🇬 CEM-Togo</span>
+        <span class="fil-mini">🇸🇳 CEM-Sénégal</span>
+        <span class="fil-mini">🇨🇲 CEM-Cameroun</span>
+        <span class="fil-mini">🇬🇭 CEM-Ghana</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Expertises</h4>
+      <a href="#services">Corps (navire)</a>
+      <a href="#services">Facultés (cargo)</a>
+      <a href="#services">Aéronautique</a>
+      <a href="#services">Industrielle</a>
+      <a href="#services">Judiciaire</a>
+      <a href="#services">Contrôle & Surveillance</a>
+    </div>
+    <div class="footer-col">
+      <h4>Filiales</h4>
+      <a href="#filiales">🇨🇮 Côte d'Ivoire (Siège)</a>
+      <a href="#filiales">🇧🇯 Bénin</a>
+      <a href="#filiales">🇹🇬 Togo</a>
+      <a href="#filiales">🇸🇳 Sénégal</a>
+      <a href="#filiales">🇨🇲 Cameroun</a>
+      <a href="#filiales">🇬🇭 Ghana</a>
+    </div>
+    <div class="footer-col">
+      <h4>Liens utiles</h4>
+      <a href="#about">À propos</a>
+      <a href="#plateforme">Plateforme CEMPROG</a>
+      <a href="http://localhost:5173" target="_blank">Connexion CEMPROG</a>
+      <a href="#contact">Demande d'intervention</a>
+      <a href="#">Mentions légales</a>
+      <a href="#">Confidentialité</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 CEMGROUPE — Compagnie des Experts Maritimes. Tous droits réservés.</p>
+    <p class="footer-cities">Abidjan · Cotonou · Lomé · Dakar · Douala · Accra</p>
+  </div>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ══════════════════════════ SCRIPTS ══════════════════════════ -->
+<script>
+// ═══════════════════════════════════════════
+// DONNÉES PORTS — coordonnées GPS réelles
+// ═══════════════════════════════════════════
+const PORTS = {
+  abidjan:  { name:'Abidjan',     pays:"Côte d'Ivoire", filiale:'CEM-CI',       statut:'Siège social · Bureau principal', dossiers:47, active:true,  siege:true,  lat:5.2735,  lng:-4.0095, desc:"Port autonome d'Abidjan — premier port d'Afrique de l'Ouest · 25 Mt/an", flag:'🇨🇮' },
+  cotonou:  { name:'Cotonou',     pays:'Bénin',          filiale:'CEM-Bénin',    statut:'Bureau CEM actif',                dossiers:9,  active:true,  siege:false, lat:6.3534,  lng:2.4201,  desc:'Port de Cotonou — hub de transit vers Niger & Burkina Faso', flag:'🇧🇯' },
+  lome:     { name:'Lomé',        pays:'Togo',            filiale:'CEM-Togo',     statut:'Bureau CEM actif',                dossiers:8,  active:true,  siege:false, lat:6.1375,  lng:1.2544,  desc:'Port autonome de Lomé — hub régional de transbordement', flag:'🇹🇬' },
+  dakar:    { name:'Dakar',       pays:'Sénégal',         filiale:'CEM-Sénégal',  statut:'Bureau CEM actif',                dossiers:12, active:true,  siege:false, lat:14.6928, lng:-17.4467, desc:'Port de Dakar — port en eau profonde · Hub CEDEAO', flag:'🇸🇳' },
+  douala:   { name:'Douala',      pays:'Cameroun',        filiale:'CEM-Cameroun', statut:'Bureau CEM actif',                dossiers:5,  active:true,  siege:false, lat:4.0500,  lng:9.7000,  desc:'Port autonome de Douala — premier port d\'Afrique centrale', flag:'🇨🇲' },
+  accra:    { name:'Accra / Tema',pays:'Ghana',           filiale:'CEM-Ghana',    statut:'Bureau CEM actif',                dossiers:3,  active:true,  siege:false, lat:5.6339,  lng:-0.0171, desc:'Port de Tema — Accra · En développement rapide', flag:'🇬🇭' },
+  sanpedro: { name:'San Pedro',   pays:"Côte d'Ivoire",  filiale:'CEM-CI',       statut:'Bureau secondaire CEM-CI',        dossiers:4,  active:true,  siege:false, lat:4.7463,  lng:-6.6361, desc:'Port de San Pedro — cacao, bois et huile de palme', flag:'🇨🇮' },
+  conakry:  { name:'Conakry',     pays:'Guinée',          filiale:'Correspondant', statut:'Correspondant',                  dossiers:2,  active:false, siege:false, lat:9.5370,  lng:-13.6773,desc:'Port autonome de Conakry — minerais & conteneurs', flag:'🇬🇳' },
+  lagos:    { name:'Lagos / Apapa',pays:'Nigeria',        filiale:'Correspondant', statut:'Correspondant',                  dossiers:1,  active:false, siege:false, lat:6.4405,  lng:3.4037,  desc:'Premier port d\'Afrique subsaharienne — en prospection', flag:'🇳🇬' },
+};
+
+// ═══════════════════════════════════════════
+// LEAFLET MAP
+// ═══════════════════════════════════════════
+const map = L.map('cem-map', {
+  center: [7.5, -1.5],
+  zoom: 5,
+  zoomControl: true,
+  scrollWheelZoom: false,
+  attributionControl: true
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains:'abcd', maxZoom:19
+}).addTo(map);
+
+// Marqueurs personnalisés
+function makeIcon(active, siege) {
+  const size  = siege ? 26 : active ? 18 : 13;
+  const color = active ? '#c9a227' : '#8a9bb0';
+  const glow  = active ? `box-shadow:0 0 ${siege?18:10}px rgba(201,162,39,${siege?.75:.45});` : '';
+  const ring  = active ? 'border:2.5px solid #060F1F;' : 'border:2px solid #060F1F;';
+  const html  = `
+    <div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};${ring}${glow}position:relative;">
+      ${siege ? `<div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px solid rgba(201,162,39,.35);animation:portRing 2s ease-out infinite;"></div>` : ''}
+      ${active && !siege ? `<div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(201,162,39,.3);animation:portRing 2.4s ease-out infinite;"></div>` : ''}
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:${size*.36}px;height:${size*.36}px;border-radius:50%;background:#f5e5aa;"></div>
+    </div>`;
+  return L.divIcon({ html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2], popupAnchor:[0,-(size/2+7)] });
+}
+
+const cssAnim = document.createElement('style');
+cssAnim.textContent = `@keyframes portRing{0%{transform:scale(1);opacity:.65}100%{transform:scale(2.2);opacity:0}}`;
+document.head.appendChild(cssAnim);
+
+const markers = {};
+Object.entries(PORTS).forEach(([id, p]) => {
+  const marker = L.marker([p.lat, p.lng], { icon: makeIcon(p.active, p.siege) });
+  const badgeClass = p.siege ? 'siege' : p.active ? 'actif' : 'correspondent';
+  const badgeLabel = p.siege ? '★ Siège social' : p.active ? '● Bureau actif' : '○ Correspondant';
+  const popupHtml = `
+    <div class="popup-inner">
+      <div class="popup-name">${p.flag} ${p.name}</div>
+      <div class="popup-country">${p.pays} · ${p.filiale}</div>
+      <span class="popup-badge ${badgeClass}">${badgeLabel}</span>
+      <div class="popup-desc">${p.desc}</div>
+      ${p.active ? `<div class="popup-dossiers">📂 ${p.dossiers} dossiers actifs</div>` : ''}
+    </div>`;
+  marker.bindPopup(popupHtml, { className:'cem-popup', maxWidth:230, minWidth:190 });
+  marker.on('click', () => { selectPort(id); marker.openPopup(); });
+  marker.addTo(map);
+  markers[id] = marker;
+});
+
+// Sidebar ports
+const portList = document.getElementById('portList');
+let activePortId = null;
+Object.entries(PORTS).forEach(([id, p]) => {
+  const item = document.createElement('div');
+  item.className = 'port-item'; item.id = 'pi-'+id;
+  item.innerHTML = `
+    <div class="port-dot ${p.active?'':'inactive'}"></div>
+    <div class="port-info">
+      <div class="port-name">${p.siege ? '★ ' : ''}${p.name}</div>
+      <div class="port-sub">${p.pays} · ${p.statut}</div>
+    </div>
+    <div class="port-count">${p.active ? p.dossiers+' dossiers' : 'Bientôt'}</div>`;
+  item.addEventListener('click', () => {
+    selectPort(id);
+    map.flyTo([p.lat, p.lng], 8, { duration: 1.3 });
+    markers[id].openPopup();
+  });
+  portList.appendChild(item);
+});
+
+function selectPort(id) {
+  if (activePortId) document.getElementById('pi-'+activePortId)?.classList.remove('active');
+  activePortId = id;
+  document.getElementById('pi-'+id)?.classList.add('active');
+}
+
+// ═══════════════════════════════════════════
+// SCROLL ANIMATIONS
+// ═══════════════════════════════════════════
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal, .reveal-l, .reveal-r').forEach(el => revealObserver.observe(el));
+
+// Navbar scroll
+const mainNav = document.getElementById('mainNav');
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  mainNav.classList.toggle('scrolled', y > 60);
+  backTop.classList.toggle('visible', y > 400);
+});
+
+// ═══════════════════════════════════════════
+// COUNTER ANIMATION
+// ═══════════════════════════════════════════
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const target = parseInt(el.dataset.target);
+      if (!target) return;
+      let current = 0;
+      const step = Math.ceil(target / 80);
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { el.textContent = target.toLocaleString('fr-FR'); clearInterval(timer); }
+        else el.textContent = current.toLocaleString('fr-FR');
+      }, 20);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+// ═══════════════════════════════════════════
+// MOBILE MENU
+// ═══════════════════════════════════════════
+function toggleMenu() {
+  document.getElementById('menuBtn').classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════
+// FORMULAIRE
+// ═══════════════════════════════════════════
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('contactForm');
+  const success = document.getElementById('formSuccess');
+  form.style.display = 'none';
+  success.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
