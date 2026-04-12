@@ -20,7 +20,7 @@
 <meta name="twitter:title" content="CEMGROUPE — Groupe d'Expertise · Afrique de l'Ouest">
 <meta name="twitter:description" content="Depuis 1946, le réseau de référence en expertise maritime, IARD & judiciaire. 9 pays couverts.">
 <!-- Favicon SVG inline -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23C9A227'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='36' font-weight='700' fill='%23060F1F'%3EC%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 128'%3E%3Ccircle cx='50' cy='46' r='40' fill='none' stroke='%231C3585' stroke-width='7'/%3E%3Cpolygon points='50,8 14,76 50,58' fill='%231C3585'/%3E%3Cpolygon points='50,8 86,76 50,58' fill='%231C3585'/%3E%3Cpolygon points='10,86 90,86 50,126' fill='%231C3585'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -59,7 +59,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy2);color:var(--white)
 #loader.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 .loader-logo{display:flex;flex-direction:column;align-items:center;gap:1rem;animation:logoFloat 2s ease-in-out infinite;}
 @keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.loader-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:14px;display:grid;place-items:center;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--navy2);box-shadow:0 0 40px rgba(201,162,39,.4),0 0 80px rgba(201,162,39,.15);}
+.loader-icon{width:72px;height:92px;background:transparent;display:grid;place-items:center;}
 .loader-name{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;background:linear-gradient(90deg,var(--white),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;}
 .loader-sub{font-size:.7rem;letter-spacing:4px;color:var(--gray);text-transform:uppercase;}
 .loader-bar-wrap{width:260px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
@@ -427,7 +427,12 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
 <!-- LOADING SCREEN -->
 <div id="loader">
   <div class="loader-logo">
-    <div class="loader-icon">C</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 128" style="width:72px;height:92px;filter:drop-shadow(0 0 20px rgba(28,53,133,.5))">
+      <circle cx="50" cy="46" r="40" fill="none" stroke="#1C3585" stroke-width="7"/>
+      <polygon points="50,8 14,76 50,58" fill="#1C3585"/>
+      <polygon points="50,8 86,76 50,58" fill="#1C3585"/>
+      <polygon points="10,86 90,86 50,126" fill="#1C3585"/>
+    </svg>
     <div class="loader-name">CEMGROUPE</div>
     <div class="loader-sub">Groupe d'Expertise — Tous Corps</div>
   </div>
@@ -439,7 +444,12 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
 <!-- NAVIGATION -->
 <nav id="navbar">
   <a href="#" class="logo">
-    <div class="logo-icon">⚓</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 128" style="width:36px;height:46px;flex-shrink:0">
+      <circle cx="50" cy="46" r="40" fill="none" stroke="#C9A227" stroke-width="7"/>
+      <polygon points="50,8 14,76 50,58" fill="#C9A227"/>
+      <polygon points="50,8 86,76 50,58" fill="#C9A227"/>
+      <polygon points="10,86 90,86 50,126" fill="#C9A227"/>
+    </svg>
     <div class="logo-text">
       <span class="logo-name">CEMGROUPE</span>
       <span class="logo-sub">Compagnie des Experts Maritimes</span>
