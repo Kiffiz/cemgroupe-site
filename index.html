@@ -126,7 +126,7 @@ p.lead{color:var(--gray);line-height:1.8;font-size:.95rem;max-width:680px}
 /* ── HERO ── */
 #hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:0 5%;overflow:hidden;}
 #hero-canvas{position:absolute;inset:0;z-index:0}
-.hero-bg{position:absolute;inset:0;z-index:0;background:url('cem_maritime_hd.jpg') center/cover no-repeat;}
+.hero-bg{position:absolute;inset:0;z-index:0;background:url('img/expert-navire.jpg') center 30%/cover no-repeat;}
 .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,15,31,.82) 0%,rgba(6,15,31,.55) 55%,rgba(6,15,31,.25) 100%);}
 .hero-grid{display:none;}
 .hero-content{position:relative;z-index:2;max-width:660px}
@@ -174,6 +174,21 @@ h1.hero-title em{font-style:italic;color:var(--gold2)}
 .about-card-main{background:linear-gradient(135deg,var(--navy4),var(--navy3));border:1px solid rgba(201,162,39,.2);border-radius:var(--radius2);padding:2.5rem;position:relative;overflow:hidden;}
 .about-card-main::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(201,162,39,.1),transparent 70%);border-radius:50%;}
 .about-card-main blockquote{font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;color:var(--white);line-height:1.7;margin-bottom:1.5rem;border-left:3px solid var(--gold);padding-left:1.2rem;}
+/* ── ABOUT PHOTO ── */
+.about-photo-wrap{position:relative;border-radius:var(--radius2);overflow:hidden;height:480px;}
+.about-photo{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .6s ease;}
+.about-photo-wrap:hover .about-photo{transform:scale(1.04);}
+.about-photo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,15,31,.92) 0%,rgba(6,15,31,.4) 50%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;}
+.about-photo-overlay blockquote{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:var(--white);line-height:1.65;margin-bottom:1.2rem;border-left:3px solid var(--gold);padding-left:1rem;}
+/* ── PHOTO STRIP ── */
+#experts-action{padding:0;overflow:hidden;}
+.photo-strip{display:grid;grid-template-columns:1.4fr 1fr 1fr;height:420px;gap:3px;}
+.photo-strip-item{position:relative;overflow:hidden;cursor:pointer;}
+.photo-strip-item img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease;}
+.photo-strip-item:hover img{transform:scale(1.07);}
+.photo-strip-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,15,31,.85) 0%,transparent 55%);opacity:0;transition:opacity .4s ease;display:flex;align-items:flex-end;padding:1.8rem;}
+.photo-strip-item:hover .photo-strip-overlay{opacity:1;}
+.photo-strip-label{font-family:'Playfair Display',serif;color:var(--white);font-size:1rem;font-weight:600;border-left:3px solid var(--gold);padding-left:.8rem;line-height:1.4;}
 .about-signature{display:flex;align-items:center;gap:1rem}
 .sig-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;font-weight:700;color:var(--navy2);font-size:1rem;flex-shrink:0;}
 .sig-name{font-weight:600;font-size:.9rem;color:var(--white)}
@@ -392,6 +407,10 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
 @media(max-width:900px){
   .hero-visual{display:none}
   .about-grid{grid-template-columns:1fr}
+  .about-photo-wrap{height:320px}
+  .photo-strip{grid-template-columns:1fr;height:auto}
+  .photo-strip-item{height:280px}
+  .photo-strip-overlay{opacity:1}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .services-grid{grid-template-columns:repeat(2,1fr)}
   .process-steps{grid-template-columns:repeat(2,1fr);gap:2rem}
@@ -628,17 +647,44 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
   </div>
 </div>
 
+<!-- ═══════════ PHOTO STRIP — EXPERTS EN ACTION ═══════════ -->
+<section id="experts-action">
+  <div class="photo-strip">
+    <div class="photo-strip-item">
+      <img src="img/expert-navire.jpg" alt="Expert CEM — Draft Survey coque de navire"/>
+      <div class="photo-strip-overlay">
+        <div class="photo-strip-label">Expertise Maritime<br><span style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:400;color:var(--gold2)">Draft survey — inspection coque</span></div>
+      </div>
+    </div>
+    <div class="photo-strip-item">
+      <img src="img/expert-equipe.jpg" alt="Expert CEM — Coordination terrain"/>
+      <div class="photo-strip-overlay">
+        <div class="photo-strip-label">Coordination Terrain<br><span style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:400;color:var(--gold2)">Réactivité · 24h/24</span></div>
+      </div>
+    </div>
+    <div class="photo-strip-item">
+      <img src="img/expert-industrie.jpg" alt="Expert CEM — Inspection industrielle"/>
+      <div class="photo-strip-overlay">
+        <div class="photo-strip-label">Inspection Industrielle<br><span style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:400;color:var(--gold2)">Contrôle équipements</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════ ABOUT ═══════════ -->
 <section id="about">
   <div class="about-grid">
     <div class="about-visual reveal-l">
-      <div class="about-card-main">
-        <blockquote>"CEMGROUPE incarne l'excellence africaine en expertise. Notre mission : protéger vos intérêts avec rigueur, partout où vous opérez sur le continent."</blockquote>
-        <div class="about-signature">
-          <div class="sig-avatar">DG</div>
-          <div>
-            <div class="sig-name">Direction Générale</div>
-            <div class="sig-title">CEMGROUPE — Abidjan, Côte d'Ivoire</div>
+      <div class="about-photo-wrap">
+        <img src="img/expert-port-1.jpg" alt="Expert CEM en opération portuaire" class="about-photo"/>
+        <div class="about-photo-overlay">
+          <blockquote>"Notre mission : protéger vos intérêts avec rigueur et objectivité, partout où vous opérez."</blockquote>
+          <div class="about-signature">
+            <div class="sig-avatar">DG</div>
+            <div>
+              <div class="sig-name">Direction Générale</div>
+              <div class="sig-title">CEMGROUPE — Abidjan, Côte d'Ivoire</div>
+            </div>
           </div>
         </div>
         <div class="about-badge-float">
