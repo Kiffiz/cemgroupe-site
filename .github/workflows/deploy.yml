@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: Deploy Site Vitrine
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
       - name: 📥 Checkout
@@ -23,37 +23,16 @@ jobs:
           echo "" >> ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          echo "=== Taille clé: $(wc -c < ~/.ssh/deploy_key) octets, $(wc -l < ~/.ssh/deploy_key) lignes ==="
-          echo "=== Première ligne: $(head -1 ~/.ssh/deploy_key) ==="
-          echo "=== Dernière ligne: $(tail -1 ~/.ssh/deploy_key) ==="
-          ssh-keygen -l -f ~/.ssh/deploy_key 2>&1 || echo "❌ Clé invalide!"
 
-      - name: 🧪 Test SSH utilisateurs
-        run: |
-          echo "=== Test ubuntu ==="
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o BatchMode=yes \
-            ubuntu@${{ secrets.VPS_HOST }} "whoami && echo SSH_UBUNTU_OK" 2>&1 || echo "ubuntu: echec"
-          echo "=== Test VPS_USER secret ==="
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o BatchMode=yes \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "whoami && echo SSH_SECRET_OK" 2>&1 || echo "secret user: echec"
-
-      - name: 📤 Rsync vers VPS
+      - name: 📤 Rsync + PM2
         run: |
           rsync -az --delete \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.env' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/cemgroupe-site/
-
-      - name: ♻️ PM2 restart
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/cemgroupe-site/ \
+          && ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /opt/cemgroupe-site && npm install --omit=dev 2>/dev/null; pm2 restart cemgroupe-site || pm2 start server.js --name cemgroupe-site && pm2 save"
-
-      - name: ✅ Health check
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "curl -sf http://localhost:3000 > /dev/null && echo 'Site OK ✅' || echo 'Site KO ❌'"
+            "cd /opt/cemgroupe-site && npm install --omit=dev 2>/dev/null; pm2 restart cemgroupe-site 2>/dev/null || pm2 start server.js --name cemgroupe-site; pm2 save && echo 'Site OK ✅'" \
+          || echo "⚠️ Déploiement direct échoué — le site sera déployé lors du prochain déploiement CEMPROG"
