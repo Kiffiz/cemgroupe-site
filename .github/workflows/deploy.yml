@@ -1,0 +1,44 @@
+name: 🚀 Déploiement Site CEMGROUPE → VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # déclenchement manuel depuis GitHub
+
+jobs:
+  deploy:
+    name: Deploy Site Vitrine
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 📤 Rsync vers VPS
+        run: |
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/cemgroupe-site/
+
+      - name: ♻️ PM2 restart
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "cd /opt/cemgroupe-site && npm install --omit=dev 2>/dev/null; pm2 restart cemgroupe-site || pm2 start server.js --name cemgroupe-site && pm2 save"
+
+      - name: ✅ Health check
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "curl -sf http://localhost:3000 > /dev/null && echo 'Site OK ✅' || echo 'Site KO ❌'"
