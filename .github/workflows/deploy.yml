@@ -18,9 +18,12 @@ jobs:
       - name: 🔑 Setup SSH
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          echo "=== Fingerprint clé ==="
+          ssh-keygen -l -f ~/.ssh/deploy_key 2>&1
 
       - name: 📤 Rsync vers VPS
         run: |
