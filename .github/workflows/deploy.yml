@@ -19,11 +19,14 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          printf '%s' "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          echo "" >> ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          echo "=== Fingerprint clé ==="
-          ssh-keygen -l -f ~/.ssh/deploy_key 2>&1
+          echo "=== Taille clé: $(wc -c < ~/.ssh/deploy_key) octets, $(wc -l < ~/.ssh/deploy_key) lignes ==="
+          echo "=== Première ligne: $(head -1 ~/.ssh/deploy_key) ==="
+          echo "=== Dernière ligne: $(tail -1 ~/.ssh/deploy_key) ==="
+          ssh-keygen -l -f ~/.ssh/deploy_key 2>&1 || echo "❌ Clé invalide!"
 
       - name: 📤 Rsync vers VPS
         run: |
