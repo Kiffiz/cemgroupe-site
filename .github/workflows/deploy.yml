@@ -28,6 +28,11 @@ jobs:
           echo "=== Dernière ligne: $(tail -1 ~/.ssh/deploy_key) ==="
           ssh-keygen -l -f ~/.ssh/deploy_key 2>&1 || echo "❌ Clé invalide!"
 
+      - name: 🧪 Test SSH verbose
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o BatchMode=yes \
+            -v ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "echo SSH_OK" 2>&1 | grep -E "debug1:|Authen|Offer|key|accept|refused|Permission|pubkey"
+
       - name: 📤 Rsync vers VPS
         run: |
           rsync -az --delete \
