@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vérification de dossier — CEMGROUPE</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #1a2b4a;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .logo-circle {
+      width: 52px; height: 52px;
+      background: #060F1F;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-circle svg { width: 30px; height: 30px; }
+    .header-text h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #060F1F;
+      line-height: 1.2;
+    }
+    .header-text p {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Card */
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px rgba(6,15,31,0.10);
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    /* Searching state */
+    .state {
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #060F1F;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .state-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .state-sub   { font-size: 0.85rem; color: #64748b; }
+
+    /* Error */
+    .error-icon { font-size: 3rem; margin-bottom: 12px; }
+    .state.error .state-title { color: #dc2626; }
+
+    /* Success */
+    .result-header {
+      background: linear-gradient(135deg, #060F1F 0%, #0f2547 100%);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .valid-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(201,162,39,0.15);
+      border: 1.5px solid #C9A227;
+      border-radius: 100px;
+      padding: 6px 14px;
+      color: #C9A227;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .valid-badge svg { flex-shrink: 0; }
+    .result-title {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+    .result-sub {
+      color: #8fa4c0;
+      font-size: 0.78rem;
+      margin-top: 3px;
+    }
+
+    /* Body */
+    .result-body { padding: 24px 28px; }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 480px) { .field-grid { grid-template-columns: 1fr; } }
+
+    .field {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .field-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .field-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a2b4a;
+      line-height: 1.3;
+    }
+    .field.full { grid-column: 1 / -1; }
+
+    /* Statut badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.75rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 100px;
+    }
+    .badge-green  { background: #dcfce7; color: #166534; }
+    .badge-orange { background: #fef3c7; color: #92400e; }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+
+    /* Footer info */
+    .verify-footer {
+      border-top: 1px solid #f1f5f9;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .verify-footer .timestamp {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+    .verify-footer a {
+      font-size: 0.72rem;
+      color: #C9A227;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* Input de recherche */
+    .search-box {
+      padding: 20px 28px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .search-box p {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .search-row {
+      display: flex; gap: 8px;
+    }
+    .search-row input {
+      flex: 1;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #1a2b4a;
+    }
+    .search-row input:focus { border-color: #060F1F; }
+    .search-row input::placeholder { color: #94a3b8; }
+    .search-row button {
+      background: #060F1F;
+      color: #C9A227;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-row button:hover { background: #0f2547; }
+
+    /* Page footer */
+    .page-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .page-footer a { color: #C9A227; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- Logo & titre -->
+  <div class="header">
+    <div class="logo-circle">
+      <!-- Ancre maritime -->
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="10" r="3.5" stroke="#C9A227" stroke-width="2"/>
+        <line x1="16" y1="13.5" x2="16" y2="28" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 22 C8 28 24 28 24 22" stroke="#C9A227" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <line x1="16" y1="8" x2="22" y2="8" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+        <line x1="16" y1="8" x2="10" y2="8" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>CEMGROUPE</h1>
+      <p>Vérification de dossier d'expertise</p>
+    </div>
+  </div>
+
+  <div class="card" id="card">
+    <!-- Loading par défaut -->
+    <div class="state" id="state-loading">
+      <div class="spinner"></div>
+      <div class="state-title">Vérification en cours…</div>
+      <div class="state-sub" id="loading-ref">Chargement du dossier</div>
+    </div>
+
+    <!-- Erreur -->
+    <div class="state error" id="state-error" style="display:none">
+      <div class="error-icon">⚠️</div>
+      <div class="state-title" id="error-title">Dossier introuvable</div>
+      <div class="state-sub" id="error-sub">La référence fournie ne correspond à aucun dossier enregistré.</div>
+    </div>
+
+    <!-- Résultat -->
+    <div id="state-result" style="display:none">
+      <div class="result-header">
+        <div>
+          <div class="result-title" id="res-numero">—</div>
+          <div class="result-sub" id="res-objet">—</div>
+        </div>
+        <div class="valid-badge" style="margin-left:auto">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          Vérifié
+        </div>
+      </div>
+
+      <div class="result-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Statut</div>
+            <div class="field-value" id="res-statut">—</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Étape</div>
+            <div class="field-value" id="res-etape">—</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Navire</div>
+            <div class="field-value" id="res-navire">—</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Date de mission</div>
+            <div class="field-value" id="res-date">—</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Expert désigné</div>
+            <div class="field-value" id="res-expert">—</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Filiale</div>
+            <div class="field-value" id="res-filiale">—</div>
+          </div>
+          <div class="field full">
+            <div class="field-label">Lieu d'expertise</div>
+            <div class="field-value" id="res-lieu">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verify-footer">
+        <span class="timestamp" id="res-timestamp">Vérifié le —</span>
+        <a href="https://cemgroupe-site.com" target="_blank">cemgroupe-site.com ↗</a>
+      </div>
+    </div>
+
+    <!-- Recherche manuelle -->
+    <div class="search-box" id="search-box" style="display:none">
+      <p>Saisissez une référence de dossier pour la vérifier :</p>
+      <div class="search-row">
+        <input type="text" id="search-input" placeholder="Ex : DOS-2024-001" />
+        <button onclick="searchRef()">Vérifier</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a href="https://cemgroupe-site.com">← Retour au site CEMGROUPE</a>
+    &nbsp;·&nbsp; Système de vérification sécurisé CEMPROG
+  </div>
+
+<script>
+  const API_BASE = 'https://cemgroupe-app.com';
+
+  function formatDate(str) {
+    if (!str) return '—';
+    const d = new Date(str);
+    if (isNaN(d)) return str;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function statutBadge(s) {
+    const cls = s === 'Terminé' ? 'badge-green' : s === 'En cours' ? 'badge-orange' : 'badge-gray';
+    return `<span class="badge ${cls}">${s}</span>`;
+  }
+
+  async function verify(ref) {
+    document.getElementById('loading-ref').textContent = ref;
+    try {
+      const res = await fetch(`${API_BASE}/api/public/verify/${encodeURIComponent(ref)}`);
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        showError('Dossier introuvable', json.error || 'La référence fournie ne correspond à aucun dossier enregistré.');
+        return;
+      }
+
+      const d = json.data;
+      document.getElementById('res-numero').textContent = d.numero;
+      document.getElementById('res-objet').textContent  = d.objet || '—';
+      document.getElementById('res-navire').textContent = d.navire || '—';
+      document.getElementById('res-lieu').textContent   = d.lieu   || '—';
+      document.getElementById('res-etape').textContent  = d.etape  || '—';
+      document.getElementById('res-expert').textContent = d.expert  || '—';
+      document.getElementById('res-filiale').textContent = d.filiale ? `${d.filiale}${d.pays ? ' · ' + d.pays : ''}` : '—';
+      document.getElementById('res-statut').innerHTML   = statutBadge(d.statut);
+      document.getElementById('res-date').textContent   = formatDate(d.date_mission);
+      document.getElementById('res-timestamp').textContent =
+        'Vérifié le ' + new Date(d.verified_at).toLocaleString('fr-FR');
+
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-result').style.display  = 'block';
+    } catch (e) {
+      showError('Erreur de connexion', 'Impossible de contacter le serveur CEMPROG. Réessayez dans quelques instants.');
+    }
+  }
+
+  function showError(title, sub) {
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('error-title').textContent = title;
+    document.getElementById('error-sub').textContent   = sub;
+    document.getElementById('state-error').style.display  = 'block';
+    document.getElementById('search-box').style.display   = 'block';
+  }
+
+  function searchRef() {
+    const val = document.getElementById('search-input').value.trim();
+    if (!val) return;
+    // Cacher erreur, afficher loading
+    document.getElementById('state-error').style.display  = 'none';
+    document.getElementById('state-result').style.display = 'none';
+    document.getElementById('state-loading').style.display = 'block';
+    document.getElementById('search-box').style.display   = 'none';
+    verify(val);
+  }
+
+  // Entrée clavier
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('search-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchRef();
+    });
+
+    // Lire le paramètre ?ref= dans l'URL
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      verify(ref);
+    } else {
+      // Pas de ref → afficher le formulaire de recherche directement
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-error').style.display   = 'none';
+      document.getElementById('search-box').style.display    = 'block';
+      // Petit message d'accueil
+      const card = document.getElementById('card');
+      const welcome = document.createElement('div');
+      welcome.className = 'state';
+      welcome.innerHTML = '<div class="error-icon">🔍</div><div class="state-title">Vérification de dossier</div><div class="state-sub">Saisissez une référence de dossier CEMGROUPE pour vérifier son authenticité.</div>';
+      card.insertBefore(welcome, card.firstChild);
+    }
+  });
+</script>
+</body>
+</html>

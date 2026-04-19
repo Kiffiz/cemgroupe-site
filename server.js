@@ -22,6 +22,7 @@ const server = http.createServer((req, res) => {
   // Nettoyer l'URL (enlever query string, éviter path traversal)
   let urlPath = req.url.split('?')[0];
   if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
+  if (urlPath === '/verify')            urlPath = '/verify.html';
 
   const filePath = path.join(__dirname, urlPath);
 
