@@ -26,6 +26,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════
    CEMGROUPE — SITE INTERNET v3.0 SPECTACULAR
@@ -345,6 +346,11 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
 .footer-legal{display:flex;gap:1.5rem}
 .footer-legal a{font-size:.75rem;color:rgba(168,200,232,.4);text-decoration:none;transition:color .2s}
 .footer-legal a:hover{color:var(--gray)}
+.footer-qr{margin-top:1.4rem;display:flex;flex-direction:column;gap:.6rem}
+.footer-qr-box{display:inline-flex;flex-direction:column;align-items:center;gap:.55rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.2);border-radius:12px;padding:12px;width:fit-content}
+.footer-qr-box canvas{border-radius:6px;display:block}
+.footer-qr-label{font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:600;text-align:center}
+.footer-qr-sub{font-size:.68rem;color:var(--gray);text-align:center;max-width:120px;line-height:1.4}
 
 /* ── TICKER LOGOS ── */
 .ticker-logo{display:flex;align-items:center;}
@@ -1159,6 +1165,14 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
         <div class="logo-text"><span class="logo-name">CEMGROUPE</span><span class="logo-sub">Groupe d'Expertise — Tous Corps</span></div>
       </a>
       <p class="footer-desc">Le réseau d'expertise de référence en Afrique de l'Ouest depuis 1962. Présents dans 8 pays, au service de vos intérêts.</p>
+      <div class="footer-qr">
+        <div class="footer-title">Accès rapide</div>
+        <div class="footer-qr-box">
+          <canvas id="footer-qr-canvas"></canvas>
+          <div class="footer-qr-label">Scannez pour accéder</div>
+          <div class="footer-qr-sub">cemgroupe-site.com</div>
+        </div>
+      </div>
     </div>
     <div>
       <div class="footer-title">Services</div>
@@ -1223,6 +1237,18 @@ footer{background:var(--navy2);border-top:1px solid rgba(201,162,39,.12);padding
 /* ═══════════════════════════════════
    CEMGROUPE v3.0 — JavaScript
    ═══════════════════════════════════ */
+
+/* ── QR CODE FOOTER ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var canvas = document.getElementById('footer-qr-canvas');
+  if (canvas && typeof QRCode !== 'undefined') {
+    QRCode.toCanvas(canvas, 'https://cemgroupe-site.com', {
+      width: 120,
+      margin: 1,
+      color: { dark: '#060F1F', light: '#ffffff' }
+    });
+  }
+});
 
 /* ── LOADER ── */
 (function(){
