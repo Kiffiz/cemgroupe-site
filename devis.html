@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demande d'intervention — CEMGROUPE</title>
+  <meta name="description" content="Demandez une expertise CEMGROUPE en quelques minutes. Remplissez ce formulaire et notre équipe vous contacte sous 24h." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #060F1F;
+      --navy2: #0f2547;
+      --gold: #C9A227;
+      --gray: #94a3b8;
+      --bg: #f0f4f8;
+      --white: #ffffff;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+      padding: 0 0 48px;
+    }
+
+    /* ── Header ── */
+    .top-bar {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+      padding: 20px 24px 24px;
+      text-align: center;
+    }
+    .top-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: rgba(201,162,39,0.15);
+      border: 1.5px solid rgba(201,162,39,0.4);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-name { font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: 0.02em; }
+    .logo-sub  { font-size: 0.65rem; color: rgba(201,162,39,0.8); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+    .top-title { font-size: 1.3rem; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .top-sub   { font-size: 0.82rem; color: #8fa4c0; line-height: 1.5; }
+    .top-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(201,162,39,0.15); border: 1px solid rgba(201,162,39,0.3);
+      color: var(--gold); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 12px; border-radius: 100px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Wrapper ── */
+    .wrapper { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+
+    /* ── Steps indicator ── */
+    .steps-bar {
+      display: flex; gap: 0;
+      background: #fff;
+      border-radius: 0 0 16px 16px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(6,15,31,0.08);
+      align-items: center;
+    }
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      color: #94a3b8;
+      font-size: 0.75rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; position: relative;
+      transition: all 0.3s;
+    }
+    .step-dot.active { background: var(--navy); color: var(--gold); }
+    .step-dot.done   { background: #dcfce7; color: #166534; }
+    .step-line { flex: 1; height: 2px; background: #e2e8f0; margin: 0 6px; }
+    .step-line.done { background: #86efac; }
+    .step-label { font-size: 0.65rem; color: #94a3b8; text-align: center; margin-top: 4px; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 16px rgba(6,15,31,0.08);
+      padding: 24px 22px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 0.88rem; font-weight: 800; color: var(--navy);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title-icon { font-size: 1rem; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 14px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label {
+      display: block;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #64748b; margin-bottom: 5px;
+    }
+    label .req { color: var(--gold); margin-left: 2px; }
+    input, select, textarea {
+      width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      padding: 11px 14px; font-size: 0.9rem; color: var(--navy);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit; background: #fff; appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--navy); box-shadow: 0 0 0 3px rgba(6,15,31,0.08);
+    }
+    input::placeholder, textarea::placeholder { color: #cbd5e1; }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+    /* ── Checkboxes services ── */
+    .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .service-check { position: relative; }
+    .service-check input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .service-check label {
+      display: flex; align-items: center; gap: 8px;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      padding: 10px 12px; cursor: pointer; transition: all 0.15s;
+      font-size: 0.8rem; font-weight: 600; color: #475569;
+      text-transform: none; letter-spacing: 0; margin: 0;
+    }
+    .service-check input:checked + label {
+      background: rgba(6,15,31,0.05); border-color: var(--navy); color: var(--navy);
+    }
+    .service-check label .svc-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ── Urgence ── */
+    .urgence-row { display: flex; gap: 8px; margin-top: 4px; }
+    .urgence-btn { position: relative; flex: 1; }
+    .urgence-btn input { position: absolute; opacity: 0; width: 0; }
+    .urgence-btn label {
+      display: block; text-align: center; padding: 9px 6px;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      cursor: pointer; font-size: 0.78rem; font-weight: 600;
+      color: #475569; transition: all 0.15s;
+      text-transform: none; letter-spacing: 0; margin: 0;
+    }
+    .urgence-btn input:checked + label { background: rgba(6,15,31,0.06); border-color: var(--navy); color: var(--navy); }
+    .urgence-btn.rouge input:checked + label { background: #fef2f2; border-color: #ef4444; color: #dc2626; }
+
+    /* ── Submit ── */
+    .btn-submit {
+      width: 100%; background: var(--navy); color: var(--gold);
+      border: none; border-radius: 12px; padding: 15px 24px;
+      font-size: 1rem; font-weight: 800; cursor: pointer;
+      letter-spacing: 0.02em; transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: var(--navy2); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── Garanties ── */
+    .garanties {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; margin-top: 14px;
+    }
+    .garantie {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; color: #64748b;
+    }
+    .garantie-dot { width: 6px; height: 6px; border-radius: 50%; background: #86efac; }
+
+    /* ── Success ── */
+    #success-screen {
+      display: none;
+      text-align: center; padding: 40px 20px;
+    }
+    .success-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .success-title { font-size: 1.3rem; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+    .success-sub { font-size: 0.88rem; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .success-ref { background: rgba(6,15,31,0.05); border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: inline-block; font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+    .btn-back { background: #f1f5f9; color: var(--navy); border: none; border-radius: 10px; padding: 11px 24px; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+    .btn-back:hover { background: #e2e8f0; }
+
+    /* ── Error ── */
+    .field-error { font-size: 0.72rem; color: #dc2626; margin-top: 4px; display: none; }
+    input.invalid, select.invalid, textarea.invalid { border-color: #ef4444; }
+
+    /* ── Page footer ── */
+    .page-foot { text-align: center; padding: 20px 16px 0; font-size: 0.72rem; color: #94a3b8; }
+    .page-foot a { color: var(--gold); text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 400px) {
+      .field-row { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="top-bar">
+  <div class="top-logo">
+    <div class="logo-icon">
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="10" r="3.5" stroke="#C9A227" stroke-width="2"/>
+        <line x1="16" y1="13.5" x2="16" y2="28" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 22 C8 28 24 28 24 22" stroke="#C9A227" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <line x1="16" y1="8" x2="22" y2="8" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+        <line x1="16" y1="8" x2="10" y2="8" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">CEMGROUPE</div>
+      <div class="logo-sub">Expertise Maritime &amp; Sinistres</div>
+    </div>
+  </div>
+  <div class="top-badge">📋 Demande d'intervention</div>
+  <div class="top-title">Faites appel à nos experts</div>
+  <div class="top-sub">Formulaire sécurisé · Réponse sous 24h · Réseau 8 pays</div>
+</div>
+
+<div class="wrapper">
+
+  <!-- Formulaire -->
+  <div id="form-screen">
+
+    <form id="devis-form" novalidate>
+
+      <!-- Vos coordonnées -->
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">👤</span> Vos coordonnées</div>
+
+        <div class="field field-row">
+          <div>
+            <label>Prénom <span class="req">*</span></label>
+            <input type="text" name="prenom" id="prenom" placeholder="Jean" autocomplete="given-name" />
+            <div class="field-error" id="err-prenom">Champ requis</div>
+          </div>
+          <div>
+            <label>Nom <span class="req">*</span></label>
+            <input type="text" name="nom" id="nom" placeholder="Konan" autocomplete="family-name" />
+            <div class="field-error" id="err-nom">Champ requis</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Société / Organisation <span class="req">*</span></label>
+          <input type="text" name="societe" id="societe" placeholder="Nom de votre entreprise" autocomplete="organization" />
+          <div class="field-error" id="err-societe">Champ requis</div>
+        </div>
+
+        <div class="field">
+          <label>Email professionnel <span class="req">*</span></label>
+          <input type="email" name="email" id="email" placeholder="votre@email.com" autocomplete="email" />
+          <div class="field-error" id="err-email">Email invalide</div>
+        </div>
+
+        <div class="field">
+          <label>Téléphone <span class="req">*</span></label>
+          <input type="tel" name="telephone" id="telephone" placeholder="+225 07 00 00 00" autocomplete="tel" />
+          <div class="field-error" id="err-telephone">Champ requis</div>
+        </div>
+
+        <div class="field">
+          <label>Pays / Filiale concernée</label>
+          <select name="pays" id="pays">
+            <option value="">— Sélectionnez un pays —</option>
+            <option>Côte d'Ivoire — Abidjan</option>
+            <option>Nigéria — Lagos</option>
+            <option>Bénin — Cotonou</option>
+            <option>Togo — Lomé</option>
+            <option>Ghana — Tema</option>
+            <option>Guinée — Conakry</option>
+            <option>Burkina Faso — Ouagadougou</option>
+            <option>Niger — Niamey</option>
+            <option>Autre / International</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Type d'expertise -->
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔍</span> Type d'expertise souhaitée <span style="color:#C9A227;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">(plusieurs choix possibles)</span></div>
+
+        <div class="services-grid">
+          <div class="service-check">
+            <input type="checkbox" name="services" value="Maritime" id="svc-maritime" />
+            <label for="svc-maritime"><span class="svc-icon">⚓</span> Maritime</label>
+          </div>
+          <div class="service-check">
+            <input type="checkbox" name="services" value="IARD" id="svc-iard" />
+            <label for="svc-iard"><span class="svc-icon">🏢</span> IARD</label>
+          </div>
+          <div class="service-check">
+            <input type="checkbox" name="services" value="Transport" id="svc-transport" />
+            <label for="svc-transport"><span class="svc-icon">🚛</span> Transport</label>
+          </div>
+          <div class="service-check">
+            <input type="checkbox" name="services" value="Judiciaire" id="svc-judiciaire" />
+            <label for="svc-judiciaire"><span class="svc-icon">⚖️</span> Judiciaire</label>
+          </div>
+          <div class="service-check">
+            <input type="checkbox" name="services" value="Industriel" id="svc-industriel" />
+            <label for="svc-industriel"><span class="svc-icon">🏭</span> Industriel</label>
+          </div>
+          <div class="service-check">
+            <input type="checkbox" name="services" value="Autre" id="svc-autre" />
+            <label for="svc-autre"><span class="svc-icon">📋</span> Autre</label>
+          </div>
+        </div>
+        <div class="field-error" id="err-services" style="margin-top:6px;">Sélectionnez au moins un type</div>
+      </div>
+
+      <!-- Description -->
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📝</span> Description de votre besoin</div>
+
+        <div class="field">
+          <label>Objet de la demande <span class="req">*</span></label>
+          <textarea name="description" id="description" placeholder="Décrivez brièvement votre sinistre ou besoin d'expertise (nature, lieu, bien concerné...)"></textarea>
+          <div class="field-error" id="err-description">Champ requis</div>
+        </div>
+
+        <div class="field">
+          <label>Niveau d'urgence</label>
+          <div class="urgence-row">
+            <div class="urgence-btn">
+              <input type="radio" name="urgence" value="Normal" id="urg-normal" checked />
+              <label for="urg-normal">🟢 Normal</label>
+            </div>
+            <div class="urgence-btn">
+              <input type="radio" name="urgence" value="Prioritaire" id="urg-prioritaire" />
+              <label for="urg-prioritaire">🟡 Prioritaire</label>
+            </div>
+            <div class="urgence-btn rouge">
+              <input type="radio" name="urgence" value="Urgent" id="urg-urgent" />
+              <label for="urg-urgent">🔴 Urgent</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Date souhaitée d'intervention</label>
+          <input type="date" name="date_souhaitee" id="date_souhaitee" min="" />
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="btn-submit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer ma demande
+      </button>
+
+      <div class="garanties">
+        <div class="garantie"><div class="garantie-dot"></div> Réponse sous 24h</div>
+        <div class="garantie"><div class="garantie-dot"></div> Données confidentielles</div>
+        <div class="garantie"><div class="garantie-dot"></div> Sans engagement</div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Success -->
+  <div id="success-screen">
+    <div class="card" style="padding:40px 24px;">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Demande envoyée !</div>
+      <div class="success-sub">Votre demande d'intervention a bien été reçue par CEMGROUPE. Notre équipe vous contactera <strong>sous 24 heures ouvrées</strong>.</div>
+      <div class="success-ref" id="ref-display">REF-XXXXXX</div>
+      <p style="font-size:0.8rem;color:#64748b;margin-bottom:20px;">Conservez cette référence pour vos échanges avec notre équipe.</p>
+      <button class="btn-back" onclick="resetForm()">← Nouvelle demande</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-foot">
+  <a href="https://cemgroupe-site.com">← Retour au site CEMGROUPE</a>
+  &nbsp;·&nbsp; Formulaire sécurisé · CEMGROUPE © 2025
+</div>
+
+<script>
+  // Date min = aujourd'hui
+  document.getElementById('date_souhaitee').min = new Date().toISOString().split('T')[0];
+
+  function validate() {
+    let ok = true;
+    const req = ['prenom','nom','societe','email','telephone','description'];
+    req.forEach(id => {
+      const el = document.getElementById(id);
+      const err = document.getElementById('err-' + id);
+      let valid = el.value.trim().length > 0;
+      if (id === 'email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+      el.classList.toggle('invalid', !valid);
+      if (err) err.style.display = valid ? 'none' : 'block';
+      if (!valid) ok = false;
+    });
+    // Services
+    const checked = document.querySelectorAll('input[name="services"]:checked');
+    const errSvc = document.getElementById('err-services');
+    if (checked.length === 0) {
+      errSvc.style.display = 'block'; ok = false;
+    } else {
+      errSvc.style.display = 'none';
+    }
+    return ok;
+  }
+
+  document.getElementById('devis-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Envoi en cours…';
+
+    const services = [...document.querySelectorAll('input[name="services"]:checked')].map(c => c.value);
+    const urgence = document.querySelector('input[name="urgence"]:checked')?.value || 'Normal';
+
+    const data = {
+      prenom: document.getElementById('prenom').value.trim(),
+      nom: document.getElementById('nom').value.trim(),
+      societe: document.getElementById('societe').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      telephone: document.getElementById('telephone').value.trim(),
+      pays: document.getElementById('pays').value,
+      services,
+      description: document.getElementById('description').value.trim(),
+      urgence,
+      date_souhaitee: document.getElementById('date_souhaitee').value,
+    };
+
+    try {
+      const res = await fetch('/api/devis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (json.success) {
+        document.getElementById('ref-display').textContent = json.reference;
+        document.getElementById('form-screen').style.display = 'none';
+        document.getElementById('success-screen').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error(json.error || 'Erreur serveur');
+      }
+    } catch(err) {
+      alert('Une erreur est survenue. Veuillez réessayer ou contacter directement CEMGROUPE au +225 27 21 35 08 07.');
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer ma demande';
+    }
+  });
+
+  function resetForm() {
+    document.getElementById('devis-form').reset();
+    document.getElementById('form-screen').style.display = 'block';
+    document.getElementById('success-screen').style.display = 'none';
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    document.querySelectorAll('.field-error').forEach(el => el.style.display = 'none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
