@@ -438,19 +438,21 @@
     };
 
     try {
-      const res = await fetch('/api/devis', {
+      const res = await fetch('https://cemgroupe-app.com/api/public/demande', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       const json = await res.json();
       if (json.success) {
-        document.getElementById('ref-display').textContent = json.reference;
+        // La réponse CEMPROG est { success: true, data: { reference, ... } }
+        const reference = json.data?.reference || json.reference || '';
+        document.getElementById('ref-display').textContent = reference;
         document.getElementById('form-screen').style.display = 'none';
         document.getElementById('success-screen').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        throw new Error(json.error || 'Erreur serveur');
+        throw new Error(json.error || json.data?.error || 'Erreur serveur');
       }
     } catch(err) {
       alert('Une erreur est survenue. Veuillez réessayer ou contacter directement CEMGROUPE au +225 27 21 35 08 07.');
