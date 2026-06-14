@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <clipPath id="innerClip">
+      <circle cx="100" cy="86" r="63"/>
+    </clipPath>
+  </defs>
+
+  <!-- Triangle derrière le cercle : base à l'équateur, pointe en bas -->
+  <polygon points="2,86 198,86 100,186" fill="#1A3D82"/>
+
+  <!-- Anneau extérieur épais navy -->
+  <circle cx="100" cy="86" r="79" fill="#1A3D82"/>
+  <!-- Espace blanc (crée l'anneau) -->
+  <circle cx="100" cy="86" r="69" fill="#ffffff"/>
+  <!-- Mince anneau navy intérieur -->
+  <circle cx="100" cy="86" r="66" fill="#1A3D82"/>
+  <!-- Zone blanche intérieure -->
+  <circle cx="100" cy="86" r="63" fill="#ffffff"/>
+
+  <!-- Aiguille de boussole (clippée dans la zone blanche) -->
+  <g clip-path="url(#innerClip)">
+    <!-- Lame gauche : grand triangle navy plein -->
+    <polygon points="76,28 98,28 100,140" fill="#1A3D82"/>
+    <!-- Séparateur blanc central (mince) -->
+    <polygon points="98,28 102,28 100,140" fill="#ffffff"/>
+    <!-- Lame droite : contour navy avec intérieur blanc -->
+    <polygon points="102,28 111,28 100,140" fill="#1A3D82"/>
+    <polygon points="103.5,29.5 109.5,29.5 100.5,138" fill="#ffffff"/>
+  </g>
+</svg>
