@@ -12,9 +12,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
+      # ── 1. Clé SSH ──────────────────────────────────────────────────────────
       - name: 🔑 Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -24,15 +22,27 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: 📤 Rsync + PM2
+      # ── 2. Déploiement par git dans /var/www/cemgroupe-site (servi par nginx) ─
+      # nginx sert le site EN STATIQUE depuis /var/www/cemgroupe-site (pas /opt, pas PM2).
+      # On synchronise par git. `set -e` + pas de `|| true` : le job ÉCHOUE si ça casse.
+      - name: 📤 Déploiement (git → /var/www/cemgroupe-site)
         run: |
-          rsync -az --delete \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='.env' \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/cemgroupe-site/ \
-          && ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /opt/cemgroupe-site && npm install --omit=dev 2>/dev/null; pm2 restart cemgroupe-site 2>/dev/null || pm2 start server.js --name cemgroupe-site; pm2 save && echo 'Site OK ✅'" \
-          || echo "⚠️ Déploiement direct échoué — le site sera déployé lors du prochain déploiement CEMPROG"
+            "set -e; \
+             REPO=/var/www/cemgroupe-site; \
+             sudo git config --global --add safe.directory \$REPO; \
+             cd \$REPO; \
+             sudo git fetch origin main; \
+             sudo git reset --hard origin/main; \
+             sudo chown -R www-data:www-data \$REPO; \
+             echo \"Déployé sur le commit : \$(sudo git rev-parse --short HEAD)\""
+
+      # ── 3. Healthcheck : le job échoue si le site ne renvoie pas 200 ─────────
+      - name: ✅ Vérification (HTTP 200 obligatoire)
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "code=\$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: cemgroupe.com' http://127.0.0.1/); \
+             echo \"Site vitrine : HTTP \$code\"; \
+             [ \"\$code\" = '200' ] || { echo 'ÉCHEC : le site ne répond pas 200'; exit 1; }"
