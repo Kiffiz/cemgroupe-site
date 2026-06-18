@@ -38,11 +38,12 @@ jobs:
              sudo chown -R www-data:www-data \$REPO; \
              echo \"Déployé sur le commit : \$(sudo git rev-parse --short HEAD)\""
 
-      # ── 3. Healthcheck : le job échoue si le site ne renvoie pas 200 ─────────
-      - name: ✅ Vérification (HTTP 200 obligatoire)
+      # ── 3. Healthcheck : le job échoue si le site HTTPS ne renvoie pas 200 ───
+      # On teste en HTTPS (le HTTP renvoie 301 vers HTTPS depuis l'ajout du certificat).
+      - name: ✅ Vérification (HTTPS 200 obligatoire)
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "code=\$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: cemgroupe.com' http://127.0.0.1/); \
-             echo \"Site vitrine : HTTP \$code\"; \
+            "code=\$(curl -sk -o /dev/null -w '%{http_code}' --resolve cemgroupe.com:443:127.0.0.1 https://cemgroupe.com/); \
+             echo \"Site vitrine (HTTPS) : \$code\"; \
              [ \"\$code\" = '200' ] || { echo 'ÉCHEC : le site ne répond pas 200'; exit 1; }"
