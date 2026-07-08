@@ -1,45 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://cemgroupe-site.com/</loc>
+    <loc>https://cemgroupe.com/</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/expertise-maritime-afrique-ouest.html</loc>
+    <loc>https://cemgroupe.com/expertise-maritime-afrique-ouest.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/commissariat-avaries-afrique.html</loc>
+    <loc>https://cemgroupe.com/commissariat-avaries-afrique.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/expertise-iard-afrique.html</loc>
+    <loc>https://cemgroupe.com/expertise-iard-afrique.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/inspection-marchandises-afrique.html</loc>
+    <loc>https://cemgroupe.com/inspection-marchandises-afrique.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/controle-navires-cargaisons.html</loc>
+    <loc>https://cemgroupe.com/controle-navires-cargaisons.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cemgroupe-site.com/expertise-judiciaire-assurance-afrique.html</loc>
+    <loc>https://cemgroupe.com/expertise-judiciaire-assurance-afrique.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cemgroupe.com/actualites.html</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cemgroupe.com/actualite-saison-des-pluies-2026.html</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cemgroupe.com/actualite-commissaire-avaries.html</loc>
+    <lastmod>2026-07-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cemgroupe.com/actualite-abidjan-coeur-reseau.html</loc>
+    <lastmod>2026-06-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
