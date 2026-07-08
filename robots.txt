@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cemgroupe-site.com/sitemap.xml
+Sitemap: https://cemgroupe.com/sitemap.xml
