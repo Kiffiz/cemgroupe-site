@@ -2059,7 +2059,7 @@ document.querySelectorAll('.counter').forEach(function(c){cobs.observe(c);});
     niamey:{lat:13.5137,lng:2.1098,label:'Niamey 🇳🇪'}
   };
   var map=L.map('map',{zoomControl:true,scrollWheelZoom:false}).setView([8,0],4);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap · © CartoDB',maxZoom:18}).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);
   var goldIcon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:#C9A227;border:3px solid rgba(201,162,39,.4);box-shadow:0 0 12px rgba(201,162,39,.7)"></div>',className:'',iconAnchor:[7,7]});
   Object.values(PORTS).forEach(function(p){L.marker([p.lat,p.lng],{icon:goldIcon}).addTo(map).bindPopup(function(){var label=document.documentElement.lang==='en'&&p.labelEn?p.labelEn:p.label;return '<div style="font-family:DM Sans,sans-serif;color:#060F1F;font-weight:600;font-size:.85rem">'+label+'</div>';});});
 })();
